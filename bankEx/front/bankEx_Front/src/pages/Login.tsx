@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Input from '../components/Input'
+import LoginButton from '../components/loginButton'
 
 export default function Login() {
   const [id, setId] = useState('')
@@ -42,9 +43,8 @@ export default function Login() {
 
         {error && <p style={styles.error}>{error}</p>}
 
-        <button style={styles.button} onClick={handleLogin}>
-          로그인
-        </button>
+        <LoginButton />
+
       </div>
     </div>
   )
