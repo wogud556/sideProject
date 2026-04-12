@@ -1,0 +1,28 @@
+# node
+node_modules/
+
+# in project
+front/bankEx_Front/node_modules
+
+# build
+dist/
+build/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# mac
+.DS_Store
+
+# vscode
+.vscode/
+
+# 기타
+coverage/
