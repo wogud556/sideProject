@@ -77,7 +77,7 @@ export default function App() {
             icon={<CreditCard className="w-6 h-6" />}
             onClick={() => handleProductSelect('신용대출')}
           />
-          <LoanProductCard
+          <LoanProduㅇㅇㅇㅇctCard
             title="주택담보대출"
             description="주택을 담보로 저금리 대출을 받을 수 있습니다"
             interestRate="연 3.2%"
