@@ -1,14 +1,7 @@
 spring:
   application:
-    name: tuneWizard
-  ## oracle
-  datasource:
-    driver-class-name: oracle.jdbc.OracleDriver
-    url: jdbc:oracle:thin:@localhost:1521/XE
-    username: hanati
-    password: hanati1234
-    hikari:
-      data-source-properties:
-        oracle.jdbc.timezoneAsRegion: false
+    name: bankEx
+  profiles:
+    active: local
 server:
   port: 8080

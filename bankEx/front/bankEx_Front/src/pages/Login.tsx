@@ -1,25 +1,33 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Input from '../components/Input'
-import LoginButton from '../components/loginButton'
+import { loginApi } from '../api/bank_api'
+import { path } from '../router/path'
 
 export default function Login() {
+  const navigate = useNavigate()
   const [id, setId] = useState('')
   const [pw, setPw] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = () => {
-    // 간단한 검증
+  const handleLogin = async () => {
     if (!id || !pw) {
       setError('아이디와 비밀번호를 입력해주세요')
       return
     }
 
-    // 임시 로그인 로직
-    if (id === 'admin' && pw === '1234') {
-      alert('로그인 성공!')
-      setError('')
-    } else {
-      setError('아이디 또는 비밀번호가 틀렸습니다')
+    setLoading(true)
+    setError('')
+
+    try {
+      const data = await loginApi(id, pw)
+      localStorage.setItem('user', JSON.stringify({ userId: data.userId, userName: data.userName }))
+      navigate(path.home)
+    } catch (err: any) {
+      setError(err?.response?.data || '로그인에 실패했습니다')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -43,8 +51,13 @@ export default function Login() {
 
         {error && <p style={styles.error}>{error}</p>}
 
-        <LoginButton />
-
+        <button
+          onClick={handleLogin}
+          disabled={loading}
+          style={{ ...styles.button, opacity: loading ? 0.7 : 1 }}
+        >
+          {loading ? '로그인 중...' : '로그인'}
+        </button>
       </div>
     </div>
   )
