@@ -1,19 +1,21 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Input from '../components/Input'
-import { loginApi } from '../api/bank_api'
+import { signupApi } from '../api/bank_api'
 import { path } from '../router/path'
 
-export default function Login() {
+export default function Signup() {
   const navigate = useNavigate()
-  const [id, setId] = useState('')
-  const [pw, setPw] = useState('')
+  const [userId, setUserId] = useState('')
+  const [password, setPassword] = useState('')
+  const [userName, setUserName] = useState('')
+  const [phone, setPhone] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleLogin = async () => {
-    if (!id || !pw) {
-      setError('아이디와 비밀번호를 입력해주세요')
+  const handleSignup = async () => {
+    if (!userId || !password || !userName || !phone) {
+      setError('모든 항목을 입력해주세요')
       return
     }
 
@@ -21,11 +23,11 @@ export default function Login() {
     setError('')
 
     try {
-      const data = await loginApi(id, pw)
-      localStorage.setItem('user', JSON.stringify({ userId: data.userId, userName: data.userName }))
-      navigate(path.home)
+      const data = await signupApi(userId, password, userName, phone)
+      alert(`회원가입 완료!\n계좌번호: ${data.accountNumber}\n로그인 후 이용해주세요.`)
+      navigate(path.login)
     } catch (err: any) {
-      setError(err?.response?.data || '로그인에 실패했습니다')
+      setError(err?.response?.data || '회원가입에 실패했습니다')
     } finally {
       setLoading(false)
     }
@@ -34,33 +36,43 @@ export default function Login() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2 style={styles.title}>🏦 BankEx</h2>
+        <h2 style={styles.title}>회원가입</h2>
+        <p style={styles.subtitle}>BankEx 계정을 만들면 계좌가 자동 생성됩니다</p>
 
         <Input
           placeholder="아이디"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
         />
-
         <Input
           type="password"
           placeholder="비밀번호"
-          value={pw}
-          onChange={(e) => setPw(e.target.value)}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Input
+          placeholder="이름"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+        />
+        <Input
+          placeholder="연락처 (010-1234-5678)"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
         />
 
         {error && <p style={styles.error}>{error}</p>}
 
         <button
-          onClick={handleLogin}
+          onClick={handleSignup}
           disabled={loading}
           style={{ ...styles.button, opacity: loading ? 0.7 : 1 }}
         >
-          {loading ? '로그인 중...' : '로그인'}
+          {loading ? '처리 중...' : '가입하기'}
         </button>
 
-        <button onClick={() => navigate(path.signup)} style={styles.linkButton}>
-          계정이 없으신가요? 회원가입
+        <button onClick={() => navigate(path.login)} style={styles.linkButton}>
+          이미 계정이 있으신가요? 로그인
         </button>
       </div>
     </div>
@@ -69,7 +81,7 @@ export default function Login() {
 
 const styles = {
   container: {
-    height: '100vh',
+    minHeight: '100vh',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -84,6 +96,12 @@ const styles = {
   },
   title: {
     textAlign: 'center' as const,
+    marginBottom: '4px',
+  },
+  subtitle: {
+    textAlign: 'center' as const,
+    fontSize: '13px',
+    color: '#888',
     marginBottom: '20px',
   },
   button: {
@@ -95,6 +113,7 @@ const styles = {
     color: '#fff',
     fontWeight: 'bold',
     cursor: 'pointer',
+    marginTop: '8px',
   },
   linkButton: {
     width: '100%',
