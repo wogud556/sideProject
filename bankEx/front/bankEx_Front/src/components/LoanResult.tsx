@@ -1,7 +1,7 @@
 import { CheckCircle2, Home } from 'lucide-react';
 import type { LoanFormData } from './LoanApplicationForm';
 
-interface LoanResultProps {
+interface LoanResultProps { 
   data: LoanFormData;
   productName: string;
   onGoHome: () => void;
