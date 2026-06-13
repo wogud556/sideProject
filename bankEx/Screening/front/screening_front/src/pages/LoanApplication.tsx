@@ -1,34 +1,39 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { applyLoan, getProduct, LoanProduct, runScreening } from '../api/screening_api'
+import { applyLoan, runScreening } from '../api/screening_api'
+import { useAuthStore } from '../stores/authStore'
+import { useLoanProductStore } from '../stores/loanProductStore'
+import { useLoanApplicationStore } from '../stores/loanApplicationStore'
 
 export default function LoanApplication() {
   const { productId } = useParams<{ productId: string }>()
   const navigate = useNavigate()
-  const [product, setProduct] = useState<LoanProduct | null>(null)
+  const { userId, isLoggedIn } = useAuthStore()
+  const { selectedProduct } = useLoanProductStore()
+  const { setCurrentApplication, setScreeningResult } = useLoanApplicationStore()
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
-  const userId = sessionStorage.getItem('userId') ?? ''
 
   useEffect(() => {
-    if (productId) {
-      getProduct(Number(productId)).then(res => setProduct(res.data))
-    }
-  }, [productId])
+    if (!isLoggedIn) { navigate('/login'); return }
+    if (!selectedProduct) { navigate('/products'); return }
+  }, [isLoggedIn, selectedProduct, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!userId) { alert('로그인이 필요합니다.'); navigate('/login'); return }
     setLoading(true)
     try {
       const applyRes = await applyLoan({
-        userId,
+        userId: userId!,
         productId: Number(productId),
         requestAmount: Number(amount),
       })
-      const applicationId = applyRes.data.applicationId
-      await runScreening(applicationId)
-      navigate(`/result/${applicationId}`)
+      setCurrentApplication(applyRes.data)
+
+      const screenRes = await runScreening(applyRes.data.applicationId)
+      setScreeningResult(screenRes.data)
+
+      navigate(`/result/${applyRes.data.applicationId}`)
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: string } })?.response?.data
       alert(msg ?? '신청 중 오류가 발생했습니다.')
@@ -37,26 +42,26 @@ export default function LoanApplication() {
     }
   }
 
-  if (!product) return <p style={{ textAlign: 'center', marginTop: 80 }}>불러오는 중...</p>
+  if (!selectedProduct) return null
 
   return (
     <div style={{ maxWidth: 480, margin: '60px auto', padding: '0 20px' }}>
       <h2>대출 신청</h2>
       <div style={infoBox}>
-        <p><strong>{product.productName}</strong> ({product.productType})</p>
-        <p>금리 {product.minInterestRate}% ~ {product.maxInterestRate}%</p>
-        <p>최대 {(product.maxLimitAmount / 10000).toLocaleString()}만원 / {product.loanPeriodMonths}개월</p>
+        <p><strong>{selectedProduct.productName}</strong> ({selectedProduct.productType})</p>
+        <p>금리 {selectedProduct.minInterestRate}% ~ {selectedProduct.maxInterestRate}%</p>
+        <p>최대 {(selectedProduct.maxLimitAmount / 10000).toLocaleString()}만원 / {selectedProduct.loanPeriodMonths}개월</p>
       </div>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
         <label style={{ fontWeight: 600 }}>신청 금액 (원)</label>
         <input
           style={inputStyle}
           type="number"
-          placeholder={`최대 ${product.maxLimitAmount.toLocaleString()}원`}
+          placeholder={`최대 ${selectedProduct.maxLimitAmount.toLocaleString()}원`}
           value={amount}
           onChange={e => setAmount(e.target.value)}
           min={100000}
-          max={product.maxLimitAmount}
+          max={selectedProduct.maxLimitAmount}
           required
         />
         <button style={submitStyle} type="submit" disabled={loading}>

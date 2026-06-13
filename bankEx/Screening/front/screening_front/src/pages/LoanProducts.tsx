@@ -1,30 +1,32 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getProducts, LoanProduct } from '../api/screening_api'
+import { getProducts } from '../api/screening_api'
+import { useAuthStore } from '../stores/authStore'
+import { useLoanProductStore } from '../stores/loanProductStore'
 
 export default function LoanProducts() {
   const navigate = useNavigate()
-  const [products, setProducts] = useState<LoanProduct[]>([])
-  const [loading, setLoading] = useState(true)
+  const { isLoggedIn } = useAuthStore()
+  const { products, setProducts, setSelectedProduct } = useLoanProductStore()
 
   useEffect(() => {
-    getProducts().then(res => {
-      setProducts(res.data)
-      setLoading(false)
-    })
-  }, [])
+    if (products.length === 0) {
+      getProducts().then(res => setProducts(res.data))
+    }
+  }, [products.length, setProducts])
 
   const handleApply = (productId: number) => {
-    const userId = sessionStorage.getItem('userId')
-    if (!userId) {
+    if (!isLoggedIn) {
       alert('로그인이 필요합니다.')
       navigate('/login')
       return
     }
+    const product = products.find(p => p.productId === productId)
+    if (product) setSelectedProduct(product)
     navigate(`/apply/${productId}`)
   }
 
-  if (loading) return <p style={{ textAlign: 'center', marginTop: 80 }}>불러오는 중...</p>
+  if (products.length === 0) return <p style={{ textAlign: 'center', marginTop: 80 }}>불러오는 중...</p>
 
   return (
     <div style={{ maxWidth: 800, margin: '40px auto', padding: '0 20px' }}>

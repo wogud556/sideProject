@@ -1,16 +1,28 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getProfile, UserProfile } from '../api/screening_api'
+import { useAuthStore } from '../stores/authStore'
+import { useLoanApplicationStore } from '../stores/loanApplicationStore'
+import { useMyApplicationStore } from '../stores/myApplicationStore'
 
 export default function MyPage() {
   const navigate = useNavigate()
-  const userId = sessionStorage.getItem('userId') ?? ''
+  const { userId, clearAuth } = useAuthStore()
+  const clearApplication = useLoanApplicationStore(s => s.clear)
+  const clearMyApplications = useMyApplicationStore(s => s.clear)
   const [profile, setProfile] = useState<UserProfile | null>(null)
 
   useEffect(() => {
     if (!userId) { navigate('/login'); return }
     getProfile(userId).then(res => setProfile(res.data))
   }, [userId, navigate])
+
+  const handleLogout = () => {
+    clearAuth()
+    clearApplication()
+    clearMyApplications()
+    navigate('/login')
+  }
 
   if (!profile) return <p style={{ textAlign: 'center', marginTop: 80 }}>불러오는 중...</p>
 
@@ -36,7 +48,7 @@ export default function MyPage() {
       )}
       <button
         style={{ padding: '10px 20px', background: '#ea4335', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', marginTop: 8 }}
-        onClick={() => { sessionStorage.clear(); navigate('/login') }}
+        onClick={handleLogout}
       >
         로그아웃
       </button>

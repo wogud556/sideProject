@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { login } from '../api/screening_api'
 import { PATH } from '../router/path'
+import { useAuthStore } from '../stores/authStore'
 
 export default function Login() {
   const navigate = useNavigate()
+  const setAuth = useAuthStore(s => s.setAuth)
   const [form, setForm] = useState({ userId: '', password: '' })
   const [error, setError] = useState('')
 
@@ -13,8 +15,7 @@ export default function Login() {
     setError('')
     try {
       const res = await login(form)
-      sessionStorage.setItem('userId', res.data.userId)
-      sessionStorage.setItem('userName', res.data.userName)
+      setAuth(res.data.userId, res.data.userName)
       navigate(PATH.PRODUCTS)
     } catch {
       setError('아이디 또는 비밀번호가 올바르지 않습니다.')

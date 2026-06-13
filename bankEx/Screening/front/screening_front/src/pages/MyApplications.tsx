@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getMyApplications, LoanApplicationResponse } from '../api/screening_api'
+import { getMyApplications } from '../api/screening_api'
+import { useAuthStore } from '../stores/authStore'
+import { useMyApplicationStore } from '../stores/myApplicationStore'
 
 const STATUS_KO: Record<string, string> = {
   APPLIED: '신청',
@@ -18,22 +20,22 @@ const STATUS_COLOR: Record<string, string> = {
 
 export default function MyApplications() {
   const navigate = useNavigate()
-  const userId = sessionStorage.getItem('userId') ?? ''
-  const [list, setList] = useState<LoanApplicationResponse[]>([])
+  const { userId, isLoggedIn } = useAuthStore()
+  const { applications, setApplications } = useMyApplicationStore()
 
   useEffect(() => {
-    if (!userId) { navigate('/login'); return }
-    getMyApplications(userId).then(res => setList(res.data))
-  }, [userId, navigate])
+    if (!isLoggedIn) { navigate('/login'); return }
+    getMyApplications(userId!).then(res => setApplications(res.data))
+  }, [isLoggedIn, userId, navigate, setApplications])
 
   return (
     <div style={{ maxWidth: 700, margin: '40px auto', padding: '0 20px' }}>
       <h2>내 대출 신청 목록</h2>
-      {list.length === 0 ? (
+      {applications.length === 0 ? (
         <p style={{ color: '#999' }}>신청 내역이 없습니다.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {list.map(a => (
+          {applications.map(a => (
             <div key={a.applicationId} style={cardStyle}>
               <div>
                 <p style={{ margin: 0, fontWeight: 600 }}>신청번호: {a.applicationId}</p>

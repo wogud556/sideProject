@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getScreeningResult, ScreeningResponse } from '../api/screening_api'
+import { getScreeningResult } from '../api/screening_api'
+import { useLoanApplicationStore } from '../stores/loanApplicationStore'
 
 const STATUS_LABEL: Record<string, string> = {
   APPROVED: '승인',
@@ -17,36 +18,36 @@ const STATUS_COLOR: Record<string, string> = {
 export default function ScreeningResult() {
   const { applicationId } = useParams<{ applicationId: string }>()
   const navigate = useNavigate()
-  const [result, setResult] = useState<ScreeningResponse | null>(null)
+  const { screeningResult, setScreeningResult } = useLoanApplicationStore()
 
   useEffect(() => {
-    if (applicationId) {
-      getScreeningResult(Number(applicationId)).then(res => setResult(res.data))
+    if (!screeningResult && applicationId) {
+      getScreeningResult(Number(applicationId)).then(res => setScreeningResult(res.data))
     }
-  }, [applicationId])
+  }, [screeningResult, applicationId, setScreeningResult])
 
-  if (!result) return <p style={{ textAlign: 'center', marginTop: 80 }}>결과 불러오는 중...</p>
+  if (!screeningResult) return <p style={{ textAlign: 'center', marginTop: 80 }}>결과 불러오는 중...</p>
 
-  const color = STATUS_COLOR[result.resultStatus] ?? '#666'
+  const color = STATUS_COLOR[screeningResult.resultStatus] ?? '#666'
 
   return (
     <div style={{ maxWidth: 520, margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
       <h2>심사 결과</h2>
       <div style={{ ...resultBox, borderTop: `4px solid ${color}` }}>
         <p style={{ fontSize: 28, fontWeight: 700, color, margin: '0 0 8px' }}>
-          {STATUS_LABEL[result.resultStatus] ?? result.resultStatus}
+          {STATUS_LABEL[screeningResult.resultStatus] ?? screeningResult.resultStatus}
         </p>
-        {result.rejectReason && (
-          <p style={{ color: '#ea4335', marginBottom: 16 }}>사유: {result.rejectReason}</p>
+        {screeningResult.rejectReason && (
+          <p style={{ color: '#ea4335', marginBottom: 16 }}>사유: {screeningResult.rejectReason}</p>
         )}
         <table style={tableStyle}>
           <tbody>
-            <Row label="CSS 점수" value={`${result.cssScore}점`} />
-            <Row label="DSR" value={`${result.dsrRate}%`} />
-            {result.resultStatus !== 'REJECTED' && (
+            <Row label="CSS 점수" value={`${screeningResult.cssScore}점`} />
+            <Row label="DSR" value={`${screeningResult.dsrRate}%`} />
+            {screeningResult.resultStatus !== 'REJECTED' && (
               <>
-                <Row label="승인 금액" value={`${result.approvedAmount.toLocaleString()}원`} />
-                <Row label="적용 금리" value={`${result.interestRate}%`} />
+                <Row label="승인 금액" value={`${screeningResult.approvedAmount.toLocaleString()}원`} />
+                <Row label="적용 금리" value={`${screeningResult.interestRate}%`} />
               </>
             )}
           </tbody>
