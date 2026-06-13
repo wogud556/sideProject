@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: screening
+  profiles:
+    active: local
+server:
+  port: 8081
