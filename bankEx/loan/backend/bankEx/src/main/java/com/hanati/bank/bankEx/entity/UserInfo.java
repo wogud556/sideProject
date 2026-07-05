@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -31,6 +32,10 @@ public class UserInfo {
 
     @Column(name = "PHONE", length = 20)
     private String phone;
+
+    @Setter
+    @Column(name = "CUSTOMER_STATUS", length = 20)
+    private String customerStatus;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;

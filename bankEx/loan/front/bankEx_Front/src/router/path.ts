@@ -5,4 +5,5 @@ export const path = {
     mypage: '/mypage',
     loan: '/loan',
     myLoans: '/my-loans',
+    accountDetail: '/account/:accountNumber',
 } as const

@@ -43,6 +43,7 @@ public class loginService {
                 .password(request.getPassword())
                 .userName(request.getUserName())
                 .phone(request.getPhone())
+                .customerStatus("ACTIVE")
                 .createdAt(LocalDateTime.now())
                 .build();
         userInfoRepository.save(user);
@@ -51,7 +52,10 @@ public class loginService {
         AccountInfo account = AccountInfo.builder()
                 .userId(request.getUserId())
                 .accountNumber(accountNumber)
+                .productCode("D001")
+                .accountName("입출금통장")
                 .balance(0L)
+                .accountStatus("ACTIVE")
                 .createdAt(LocalDateTime.now())
                 .build();
         accountInfoRepository.save(account);

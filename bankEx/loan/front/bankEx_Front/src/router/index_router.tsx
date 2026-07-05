@@ -5,6 +5,7 @@ import Signup from '../pages/Signup'
 import MyPage from '../pages/MyPage'
 import Loan from '../pages/loan'
 import MyLoans from '../pages/MyLoans'
+import AccountDetail from '../pages/AccountDetail'
 import { path } from './path'
 
 export default function AppRouter() {
@@ -17,6 +18,7 @@ export default function AppRouter() {
         <Route path={path.mypage} element={<MyPage />} />
         <Route path={path.loan} element={<Loan />} />
         <Route path={path.myLoans} element={<MyLoans />} />
+        <Route path={path.accountDetail} element={<AccountDetail />} />
       </Routes>
     </BrowserRouter>
   )

@@ -1,8 +1,13 @@
 package com.hanati.bank.bankEx.controller;
 
+import com.hanati.bank.bankEx.dto.LoanAccountValidateResponse;
 import com.hanati.bank.bankEx.dto.LoanApplicationRequest;
 import com.hanati.bank.bankEx.dto.LoanApplicationResponse;
+import com.hanati.bank.bankEx.dto.LoanDisbursementRequest;
+import com.hanati.bank.bankEx.dto.LoanDisbursementResponse;
 import com.hanati.bank.bankEx.dto.LoanProductResponse;
+import com.hanati.bank.bankEx.dto.LoanRepaymentRequest;
+import com.hanati.bank.bankEx.dto.LoanRepaymentResponse;
 import com.hanati.bank.bankEx.service.loanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -44,5 +49,26 @@ public class loanController {
     @GetMapping("/loan/applications")
     public ResponseEntity<List<LoanApplicationResponse>> getMyApplications(@RequestParam String userId) {
         return ResponseEntity.ok(loanService.getMyApplications(userId));
+    }
+
+    @GetMapping("/loan/validate-customer-account")
+    public ResponseEntity<LoanAccountValidateResponse> validateCustomerAccount(@RequestParam String userId,
+                                                                                @RequestParam String accountNumber) {
+        return ResponseEntity.ok(loanService.validateCustomerAccount(userId, accountNumber));
+    }
+
+    @PostMapping("/loan/applications/{applicationId}/approve")
+    public ResponseEntity<LoanApplicationResponse> approveApplication(@PathVariable Long applicationId) {
+        return ResponseEntity.ok(loanService.approveApplication(applicationId));
+    }
+
+    @PostMapping("/loan/disbursement")
+    public ResponseEntity<LoanDisbursementResponse> disburse(@RequestBody LoanDisbursementRequest request) {
+        return ResponseEntity.ok(loanService.disburse(request));
+    }
+
+    @PostMapping("/loan/repayment")
+    public ResponseEntity<LoanRepaymentResponse> repay(@RequestBody LoanRepaymentRequest request) {
+        return ResponseEntity.ok(loanService.repay(request));
     }
 }

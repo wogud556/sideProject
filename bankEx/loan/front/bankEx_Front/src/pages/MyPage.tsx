@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUserProfileApi, type UserProfileResponse } from '../api/bank_api'
+import { getUserProfileApi, openAccountApi, extractErrorMessage, type UserProfileResponse } from '../api/bank_api'
 import { path } from '../router/path'
 
 export default function MyPage() {
@@ -10,22 +10,48 @@ export default function MyPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null)
+  const [newAccountName, setNewAccountName] = useState('')
+  const [opening, setOpening] = useState(false)
+  const [openError, setOpenError] = useState('')
+
+  const loadProfile = () => {
+    if (!user) return
+    getUserProfileApi(user.userId)
+      .then(setProfile)
+      .catch(() => setError('정보를 불러오지 못했습니다'))
+      .finally(() => setLoading(false))
+  }
 
   useEffect(() => {
     if (!user) {
       navigate(path.login)
       return
     }
-    getUserProfileApi(user.userId)
-      .then(setProfile)
-      .catch(() => setError('정보를 불러오지 못했습니다'))
-      .finally(() => setLoading(false))
+    loadProfile()
   }, [])
 
   const handleCopy = (accountNumber: string) => {
     navigator.clipboard.writeText(accountNumber)
     setCopiedAccount(accountNumber)
     setTimeout(() => setCopiedAccount(null), 2000)
+  }
+
+  const handleOpenAccount = async () => {
+    if (!newAccountName.trim()) {
+      setOpenError('계좌 이름을 입력해주세요')
+      return
+    }
+    setOpening(true)
+    setOpenError('')
+    try {
+      await openAccountApi(user.userId, 'D002', newAccountName.trim())
+      setNewAccountName('')
+      loadProfile()
+    } catch (err) {
+      setOpenError(extractErrorMessage(err, '계좌 개설에 실패했습니다'))
+    } finally {
+      setOpening(false)
+    }
   }
 
   if (loading) {
@@ -90,10 +116,30 @@ export default function MyPage() {
                         </button>
                       </div>
                       <p style={styles.accountDate}>개설일: {account.createdAt.slice(0, 10)}</p>
+                      <button
+                        onClick={() => navigate(`/account/${account.accountNumber}`)}
+                        style={styles.detailButton}
+                      >
+                        입출금 / 거래내역 →
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
+
+              <div style={styles.openAccountBox}>
+                <input
+                  type="text"
+                  placeholder="새 계좌 이름 (예: 저축통장)"
+                  value={newAccountName}
+                  onChange={(e) => setNewAccountName(e.target.value)}
+                  style={styles.openAccountInput}
+                />
+                <button onClick={handleOpenAccount} disabled={opening} style={styles.openAccountButton}>
+                  {opening ? '개설 중...' : '+ 계좌 개설'}
+                </button>
+              </div>
+              {openError && <p style={styles.error}>{openError}</p>}
             </section>
           </>
         )}
@@ -248,7 +294,42 @@ const styles = {
   accountDate: {
     fontSize: '12px',
     color: '#bbb',
-    margin: '0',
+    margin: '0 0 8px 0',
+  },
+  detailButton: {
+    width: '100%',
+    padding: '8px',
+    borderRadius: '8px',
+    border: '1px solid #2c7be5',
+    background: '#fff',
+    color: '#2c7be5',
+    cursor: 'pointer',
+    fontSize: '13px',
+    fontWeight: '500',
+  },
+  openAccountBox: {
+    display: 'flex',
+    gap: '8px',
+    marginTop: '12px',
+  },
+  openAccountInput: {
+    flex: 1,
+    padding: '10px 12px',
+    borderRadius: '8px',
+    border: '1px solid #ddd',
+    fontSize: '13px',
+    boxSizing: 'border-box' as const,
+  },
+  openAccountButton: {
+    padding: '10px 14px',
+    borderRadius: '8px',
+    border: 'none',
+    background: '#2c7be5',
+    color: '#fff',
+    cursor: 'pointer',
+    fontSize: '13px',
+    fontWeight: 'bold',
+    whiteSpace: 'nowrap' as const,
   },
   center: {
     textAlign: 'center' as const,

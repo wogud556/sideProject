@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignupRequest {
+public class AccountOpenRequest {
     private String userId;
-    private String password;
-    private String userName;
-    private String phone;
+    private String productCode;
+    private String accountName;
 }

@@ -11,5 +11,6 @@ public class LoanApplicationResponse {
     private Long requestAmount;
     private Integer loanPeriod;
     private String status;
+    private Long remainingBalance;
     private String createdAt;
 }

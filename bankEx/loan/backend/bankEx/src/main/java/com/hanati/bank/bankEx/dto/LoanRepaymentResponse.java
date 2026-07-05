@@ -2,15 +2,14 @@ package com.hanati.bank.bankEx.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-public class LoanApplicationRequest {
+public class LoanRepaymentResponse {
+    private Long applicationId;
     private String userId;
     private String accountNumber;
-    private Long productId;
-    private Long requestAmount;
-    private Integer loanPeriod;
+    private Long repaymentAmount;
+    private Long remainingBalance;
+    private String message;
 }

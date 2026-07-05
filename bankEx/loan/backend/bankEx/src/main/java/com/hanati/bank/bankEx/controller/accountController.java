@@ -1,13 +1,11 @@
 package com.hanati.bank.bankEx.controller;
 
+import com.hanati.bank.bankEx.dto.AccountOpenRequest;
 import com.hanati.bank.bankEx.dto.AccountResponse;
 import com.hanati.bank.bankEx.service.accountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,5 +19,15 @@ public class accountController {
     @GetMapping("/accounts")
     public ResponseEntity<List<AccountResponse>> getAccounts(@RequestParam String userId) {
         return ResponseEntity.ok(accountService.getAccounts(userId));
+    }
+
+    @GetMapping("/accounts/{accountNumber}")
+    public ResponseEntity<AccountResponse> getAccount(@PathVariable String accountNumber) {
+        return ResponseEntity.ok(accountService.getAccount(accountNumber));
+    }
+
+    @PostMapping("/accounts")
+    public ResponseEntity<AccountResponse> openAccount(@RequestBody AccountOpenRequest request) {
+        return ResponseEntity.ok(accountService.openAccount(request));
     }
 }

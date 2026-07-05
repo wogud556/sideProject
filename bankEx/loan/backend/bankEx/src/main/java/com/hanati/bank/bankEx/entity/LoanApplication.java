@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -36,8 +37,13 @@ public class LoanApplication {
     @Column(name = "LOAN_PERIOD", nullable = false)
     private Integer loanPeriod;
 
+    @Setter
     @Column(name = "STATUS", length = 20)
     private String status;
+
+    @Setter
+    @Column(name = "REMAINING_BALANCE")
+    private Long remainingBalance;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
