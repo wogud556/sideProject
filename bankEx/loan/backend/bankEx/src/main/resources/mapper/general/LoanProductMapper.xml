@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hanati.bank.bankEx.loan.general.mapper.LoanProductMapper">
+
+    <select id="findAll" resultType="com.hanati.bank.bankEx.loan.general.domain.LoanProduct">
+        SELECT PRODUCT_ID, PRODUCT_NAME, INTEREST_RATE, MAX_LIMIT, DESCRIPTION
+        FROM LOAN_PRODUCT
+    </select>
+
+    <select id="findById" resultType="com.hanati.bank.bankEx.loan.general.domain.LoanProduct">
+        SELECT PRODUCT_ID, PRODUCT_NAME, INTEREST_RATE, MAX_LIMIT, DESCRIPTION
+        FROM LOAN_PRODUCT
+        WHERE PRODUCT_ID = #{productId}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM LOAN_PRODUCT
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="productId" keyColumn="PRODUCT_ID">
+        INSERT INTO LOAN_PRODUCT (PRODUCT_NAME, INTEREST_RATE, MAX_LIMIT, DESCRIPTION)
+        VALUES (#{productName}, #{interestRate}, #{maxLimit}, #{description})
+    </insert>
+
+</mapper>

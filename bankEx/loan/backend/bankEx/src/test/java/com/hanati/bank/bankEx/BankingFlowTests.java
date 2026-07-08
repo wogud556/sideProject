@@ -2,26 +2,25 @@ package com.hanati.bank.bankEx;
 
 import com.hanati.bank.bankEx.common.exception.BusinessException;
 import com.hanati.bank.bankEx.common.exception.ErrorCode;
-import com.hanati.bank.bankEx.dto.AccountOpenRequest;
-import com.hanati.bank.bankEx.dto.AccountResponse;
-import com.hanati.bank.bankEx.dto.DepositRequest;
-import com.hanati.bank.bankEx.dto.LoanAccountValidateResponse;
-import com.hanati.bank.bankEx.dto.LoanApplicationRequest;
-import com.hanati.bank.bankEx.dto.LoanApplicationResponse;
-import com.hanati.bank.bankEx.dto.LoanDisbursementRequest;
-import com.hanati.bank.bankEx.dto.LoanDisbursementResponse;
-import com.hanati.bank.bankEx.dto.LoanRepaymentRequest;
-import com.hanati.bank.bankEx.dto.LoanRepaymentResponse;
-import com.hanati.bank.bankEx.dto.SignupRequest;
-import com.hanati.bank.bankEx.dto.SignupResponse;
-import com.hanati.bank.bankEx.dto.TransactionResponse;
-import com.hanati.bank.bankEx.dto.WithdrawRequest;
-import com.hanati.bank.bankEx.entity.LoanProduct;
-import com.hanati.bank.bankEx.repository.LoanProductRepository;
-import com.hanati.bank.bankEx.service.accountService;
-import com.hanati.bank.bankEx.service.loanService;
-import com.hanati.bank.bankEx.service.loginService;
-import com.hanati.bank.bankEx.service.transService;
+import com.hanati.bank.bankEx.deposit.general.dto.AccountOpenRequest;
+import com.hanati.bank.bankEx.deposit.general.dto.AccountResponse;
+import com.hanati.bank.bankEx.deposit.general.dto.DepositRequest;
+import com.hanati.bank.bankEx.deposit.general.dto.TransactionResponse;
+import com.hanati.bank.bankEx.deposit.general.dto.WithdrawRequest;
+import com.hanati.bank.bankEx.deposit.general.service.accountService;
+import com.hanati.bank.bankEx.deposit.general.service.transService;
+import com.hanati.bank.bankEx.login.dto.SignupRequest;
+import com.hanati.bank.bankEx.login.dto.SignupResponse;
+import com.hanati.bank.bankEx.login.service.loginService;
+import com.hanati.bank.bankEx.loan.general.dto.LoanAccountValidateResponse;
+import com.hanati.bank.bankEx.loan.general.dto.LoanApplicationRequest;
+import com.hanati.bank.bankEx.loan.general.dto.LoanApplicationResponse;
+import com.hanati.bank.bankEx.loan.general.dto.LoanDisbursementRequest;
+import com.hanati.bank.bankEx.loan.general.dto.LoanDisbursementResponse;
+import com.hanati.bank.bankEx.loan.general.dto.LoanProductResponse;
+import com.hanati.bank.bankEx.loan.general.dto.LoanRepaymentRequest;
+import com.hanati.bank.bankEx.loan.general.dto.LoanRepaymentResponse;
+import com.hanati.bank.bankEx.loan.general.service.loanService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,8 +44,6 @@ class BankingFlowTests {
     private transService transService;
     @Autowired
     private loanService loanService;
-    @Autowired
-    private LoanProductRepository loanProductRepository;
 
     private SignupResponse signup(String userId) {
         return loginService.signup(new SignupRequest(userId, "pw1234", "홍길동", "01012345678"));
@@ -126,7 +123,7 @@ class BankingFlowTests {
     void loanFlow_validateApproveDisburseRepay() {
         String userId = "user7";
         String accountNumber = signup(userId).getAccountNumber();
-        Long productId = loanProductRepository.findAll().get(0).getProductId();
+        Long productId = loanService.getProducts().get(0).getProductId();
 
         LoanAccountValidateResponse validation = loanService.validateCustomerAccount(userId, accountNumber);
         assertTrue(validation.isValid());
@@ -150,7 +147,7 @@ class BankingFlowTests {
         assertEquals(700_000L, repayment.getRemainingBalance());
         assertEquals(700_000L, accountService.getAccount(accountNumber).getBalance());
 
-        List<LoanProduct> products = loanProductRepository.findAll();
+        List<LoanProductResponse> products = loanService.getProducts();
         assertTrue(products.size() >= 1);
     }
 }
