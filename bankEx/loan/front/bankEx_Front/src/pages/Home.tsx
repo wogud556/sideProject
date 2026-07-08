@@ -24,6 +24,7 @@ export default function Home() {
 
         <div style={styles.menuGrid}>
           <MenuButton label="대출 상품" emoji="💰" onClick={() => navigate(path.loan)} />
+          <MenuButton label="전세대출" emoji="🏠" onClick={() => navigate(path.jeonseLoan)} />
           <MenuButton label="내 대출 내역" emoji="📋" onClick={() => navigate(path.myLoans)} />
           <MenuButton label="마이페이지" emoji="👤" onClick={() => navigate(path.mypage)} />
         </div>

@@ -72,6 +72,73 @@ export interface LoanRepaymentResponse {
     message: string
 }
 
+export interface JeonseLoanProductResponse {
+    productId: string
+    productName: string
+    productType: string
+    maxLimitAmount: number
+    baseRate: number
+    minRate: number
+    maxRate: number
+}
+
+export interface JeonseContractRequest {
+    lessorName: string
+    lessorPhone: string
+    houseAddress: string
+    houseType: string
+    capitalAreaYn: string
+    depositAmount: number
+    downPaymentAmount: number
+    contractStartDate: string
+    contractEndDate: string
+    fixedDateYn: string
+    moveInPlanYn: string
+    seniorClaimAmount: number
+}
+
+export interface JeonseLoanApplyRequest {
+    userId: string
+    productId: string
+    requestAmount: number
+    annualIncome: number
+    existingDebtAmount: number
+    creditScore: number
+    homelessYn: string
+    householderYn: string
+    guaranteeOrg: string
+    repaymentType: string
+    salaryTransferYn: boolean
+    cardUsageYn: boolean
+    autoTransferYn: boolean
+    contract: JeonseContractRequest
+}
+
+export interface JeonseLoanApplyResponse {
+    applicationId: string
+    status: string
+    availableLimitAmount: number | null
+    requestAmount: number
+    estimatedRate: number | null
+    message: string
+}
+
+export interface JeonseLoanReviewResponse {
+    applicationId: string
+    status: string
+    approvedAmount: number | null
+    loanRate: number | null
+    message: string
+}
+
+export interface JeonseLoanExecuteResponse {
+    applicationId: string
+    status: string
+    executedAmount: number
+    firstPaymentDate: string
+    message: string
+}
+
 export function extractErrorMessage(err: any, fallback: string): string {
     const data = err?.response?.data
     if (typeof data === 'string') return data
@@ -194,5 +261,25 @@ export async function repayLoanApi(
     repaymentAmount: number
 ): Promise<LoanRepaymentResponse> {
     const response = await api.post<LoanRepaymentResponse>('/loan/repayment', { applicationId, repaymentAmount })
+    return response.data
+}
+
+export async function getJeonseLoanProductsApi(): Promise<JeonseLoanProductResponse[]> {
+    const response = await api.get<JeonseLoanProductResponse[]>('/loan/jeonse/products')
+    return response.data
+}
+
+export async function applyJeonseLoanApi(request: JeonseLoanApplyRequest): Promise<JeonseLoanApplyResponse> {
+    const response = await api.post<JeonseLoanApplyResponse>('/loan/jeonse/applications', request)
+    return response.data
+}
+
+export async function reviewJeonseLoanApi(applicationId: string): Promise<JeonseLoanReviewResponse> {
+    const response = await api.post<JeonseLoanReviewResponse>(`/loan/jeonse/applications/${applicationId}/review`)
+    return response.data
+}
+
+export async function executeJeonseLoanApi(applicationId: string): Promise<JeonseLoanExecuteResponse> {
+    const response = await api.post<JeonseLoanExecuteResponse>(`/loan/jeonse/applications/${applicationId}/execute`)
     return response.data
 }

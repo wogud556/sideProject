@@ -17,7 +17,10 @@ public enum ErrorCode {
     INVALID_AMOUNT("금액이 올바르지 않습니다."),
     LOAN_APPLICATION_NOT_FOUND("대출 신청 정보를 찾을 수 없습니다."),
     LOAN_NOT_APPROVED("승인되지 않은 대출입니다."),
-    LOAN_ACCOUNT_MISMATCH("대출 계좌 정보가 일치하지 않습니다.");
+    LOAN_ACCOUNT_MISMATCH("대출 계좌 정보가 일치하지 않습니다."),
+    JEONSE_PRODUCT_NOT_FOUND("전세대출 상품을 찾을 수 없습니다."),
+    JEONSE_APPLICATION_NOT_FOUND("전세대출 신청 정보를 찾을 수 없습니다."),
+    JEONSE_INVALID_APPLICATION_STATE("현재 상태에서는 처리할 수 없는 요청입니다.");
 
     private final String message;
 }
