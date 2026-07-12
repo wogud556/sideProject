@@ -8,7 +8,7 @@ BankEx is a full-stack banking web application simulating KB국민은행 feature
 
 ## Commands
 
-### Frontend (`loan/front/bankEx_Front/`)
+### Frontend (`bankEx/front/bankEx_Front/`)
 ```bash
 npm run dev      # dev server at http://localhost:5173
 npm run build    # tsc -b && vite build
@@ -16,7 +16,7 @@ npm run lint     # eslint
 npm run preview  # preview production build
 ```
 
-### Backend (`loan/backend/bankEx/`)
+### Backend (`bankEx/backend/bankEx/`)
 ```bash
 ./gradlew bootRun        # start server at http://localhost:8080
 ./gradlew build          # build JAR
@@ -45,7 +45,7 @@ npm run preview  # preview production build
 ### Database
 - Oracle XE at `localhost:1521/XE`, schema: `hanati`
 - Dual ORM: JPA + MyBatis (both configured via `spring-boot-starter-data-jpa` and `mybatis-spring-boot-starter`)
-- Config: `loan/backend/bankEx/src/main/resources/application.yml`
+- Config: `bankEx/backend/bankEx/src/main/resources/application.yml`
 
 
 # CLAUDE.md
