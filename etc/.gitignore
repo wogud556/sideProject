@@ -12,8 +12,7 @@ build/
 .env
 .env.local
 .env.*.local
-venv/
-etc/domain-gesture-ar/.venv/
+.venv
 
 # logs
 npm-debug.log*
