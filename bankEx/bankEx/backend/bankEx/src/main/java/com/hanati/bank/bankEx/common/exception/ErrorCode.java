@@ -32,7 +32,16 @@ public enum ErrorCode {
     SAVINGS_DUPLICATED_SUBSCRIPTION("이미 가입 중인 적금 계좌가 있습니다."),
     SAVINGS_INVALID_TRANSFER_DAY("자동이체일은 5, 10, 15, 20, 25일 중 하나여야 합니다."),
     SAVINGS_ALREADY_TERMINATED("이미 해지되었거나 만기 처리된 계좌입니다."),
-    SAVINGS_FULLY_PAID("이미 전체 회차 납입이 완료되었습니다.");
+    SAVINGS_FULLY_PAID("이미 전체 회차 납입이 완료되었습니다."),
+    ACCOUNT_NOT_OWNED("본인 소유의 출금계좌가 아닙니다."),
+    SAME_ACCOUNT_TRANSFER("동일 계좌 간 이체는 불가능합니다."),
+    INVALID_ACCOUNT_PASSWORD("계좌 비밀번호가 일치하지 않습니다."),
+    INVALID_TRANSFER_AMOUNT("이체 금액이 올바르지 않습니다."),
+    PER_TRANSFER_LIMIT_EXCEEDED("1회 이체한도를 초과했습니다."),
+    DAILY_TRANSFER_LIMIT_EXCEEDED("1일 이체한도를 초과했습니다."),
+    DUPLICATE_TRANSFER_REQUEST("이미 처리 중이거나 완료된 이체 요청입니다."),
+    TRANSFER_NOT_FOUND("이체 내역을 찾을 수 없습니다."),
+    TRANSFER_PROCESSING_FAILED("이체 처리 중 오류가 발생했습니다.");
 
     private final String message;
 }

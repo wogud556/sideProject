@@ -31,7 +31,7 @@ class JeonseLoanFlowTests {
     private loginService loginService;
 
     private void signup(String userId) {
-        loginService.signup(new SignupRequest(userId, "pw1234", "홍길동", "01012345678"));
+        loginService.signup(new SignupRequest(userId, "pw1234", "홍길동", "01012345678", "1234"));
     }
 
     private JeonseContractRequest contract(long deposit, long downPayment, String capitalAreaYn,

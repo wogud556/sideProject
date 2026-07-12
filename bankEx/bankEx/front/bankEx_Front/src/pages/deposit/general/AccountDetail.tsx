@@ -9,8 +9,8 @@ import {
   extractErrorMessage,
   type AccountResponse,
   type TransactionResponse,
-} from '../api/bank_api'
-import { path } from '../router/path'
+} from '../../../api/bank_api'
+import { path } from '../../../router/path'
 
 const TYPE_LABEL: Record<string, string> = {
   DEPOSIT: '입금',

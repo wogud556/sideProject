@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { path } from '../router/path'
+import { path } from '../../router/path'
 
 export default function Home() {
   const navigate = useNavigate()

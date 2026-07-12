@@ -2,6 +2,7 @@ package com.hanati.bank.bankEx.deposit.general.service;
 
 import com.hanati.bank.bankEx.common.exception.BusinessException;
 import com.hanati.bank.bankEx.common.exception.ErrorCode;
+import com.hanati.bank.bankEx.common.util.TransactionNoGenerator;
 import com.hanati.bank.bankEx.deposit.general.dto.DepositRequest;
 import com.hanati.bank.bankEx.deposit.general.dto.TransactionResponse;
 import com.hanati.bank.bankEx.deposit.general.dto.WithdrawRequest;
@@ -10,6 +11,7 @@ import com.hanati.bank.bankEx.deposit.general.entity.DepositTransaction;
 import com.hanati.bank.bankEx.deposit.general.repository.AccountInfoRepository;
 import com.hanati.bank.bankEx.deposit.general.repository.DepositTransactionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +76,67 @@ public class transService {
 
         DepositTransaction transaction = recordTransaction(account, transactionType, amount, description, now);
         return toResponse(transaction);
+    }
+
+    @Transactional
+    public DepositTransaction debitLocked(AccountInfo lockedAccount, Long amount, String transactionType,
+                                           String description, String transactionNumber, Long transferId,
+                                           LocalDateTime now) {
+        if (amount == null || amount <= 0) {
+            throw new BusinessException(ErrorCode.INVALID_AMOUNT);
+        }
+        if (lockedAccount.getBalance() < amount) {
+            throw new BusinessException(ErrorCode.INSUFFICIENT_BALANCE);
+        }
+        Long balanceBefore = lockedAccount.getBalance();
+        lockedAccount.setBalance(balanceBefore - amount);
+        lockedAccount.setUpdatedAt(now);
+        accountInfoRepository.save(lockedAccount);
+        return recordTransferTransaction(lockedAccount, transactionType, amount, balanceBefore,
+                description, transactionNumber, transferId, now);
+    }
+
+    @Transactional
+    public DepositTransaction creditLocked(AccountInfo lockedAccount, Long amount, String transactionType,
+                                            String description, String transactionNumber, Long transferId,
+                                            LocalDateTime now) {
+        Long balanceBefore = lockedAccount.getBalance();
+        lockedAccount.setBalance(balanceBefore + amount);
+        lockedAccount.setUpdatedAt(now);
+        accountInfoRepository.save(lockedAccount);
+        return recordTransferTransaction(lockedAccount, transactionType, amount, balanceBefore,
+                description, transactionNumber, transferId, now);
+    }
+
+    private static final int MAX_TRANSACTION_NUMBER_RETRY = 5;
+
+    private DepositTransaction recordTransferTransaction(AccountInfo account, String transactionType, Long amount,
+            Long balanceBefore, String description, String transactionNumber, Long transferId, LocalDateTime now) {
+        String txnNo = transactionNumber;
+        for (int attempt = 1; attempt <= MAX_TRANSACTION_NUMBER_RETRY; attempt++) {
+            DepositTransaction tx = DepositTransaction.builder()
+                    .accountId(account.getAccountId())
+                    .accountNumber(account.getAccountNumber())
+                    .transactionType(transactionType)
+                    .amount(amount)
+                    .balanceBefore(balanceBefore)
+                    .balanceAfter(account.getBalance())
+                    .description(description)
+                    .transactionStatus("COMPLETED")
+                    .transactionNumber(txnNo)
+                    .transferId(transferId)
+                    .transactionAt(now)
+                    .build();
+            try {
+                return depositTransactionRepository.save(tx);
+            } catch (DataIntegrityViolationException e) {
+                if (attempt == MAX_TRANSACTION_NUMBER_RETRY) {
+                    throw new BusinessException(ErrorCode.TRANSFER_PROCESSING_FAILED);
+                }
+                txnNo = TransactionNoGenerator.generate(depositTransactionRepository::existsByTransactionNumber);
+            }
+        }
+        throw new BusinessException(ErrorCode.TRANSFER_PROCESSING_FAILED);
     }
 
     private AccountInfo getActiveAccount(String accountNumber) {

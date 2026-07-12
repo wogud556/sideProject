@@ -46,7 +46,7 @@ class BankingFlowTests {
     private loanService loanService;
 
     private SignupResponse signup(String userId) {
-        return loginService.signup(new SignupRequest(userId, "pw1234", "홍길동", "01012345678"));
+        return loginService.signup(new SignupRequest(userId, "pw1234", "홍길동", "01012345678", "1234"));
     }
 
     @Test
@@ -113,7 +113,7 @@ class BankingFlowTests {
         String userId = "user6";
         signup(userId);
 
-        AccountResponse account = accountService.openAccount(new AccountOpenRequest(userId, "D002", "저축통장"));
+        AccountResponse account = accountService.openAccount(new AccountOpenRequest(userId, "D002", "저축통장", "1234"));
 
         assertEquals(2, accountService.getAccounts(userId).size());
         assertEquals(0L, account.getBalance());

@@ -49,6 +49,10 @@ public class accountService {
             throw new BusinessException(ErrorCode.CUSTOMER_NOT_ACTIVE);
         }
 
+        if (request.getAccountPassword() == null || request.getAccountPassword().isBlank()) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST);
+        }
+
         String accountNumber = AccountNoGenerator.generate(accountInfoRepository::existsByAccountNumber);
         LocalDateTime now = LocalDateTime.now();
         AccountInfo account = AccountInfo.builder()
@@ -58,6 +62,9 @@ public class accountService {
                 .accountName(request.getAccountName())
                 .balance(0L)
                 .accountStatus("ACTIVE")
+                .accountPassword(request.getAccountPassword())
+                .perTransferLimit(5_000_000L)
+                .dailyTransferLimit(10_000_000L)
                 .createdAt(now)
                 .build();
         accountInfoRepository.save(account);

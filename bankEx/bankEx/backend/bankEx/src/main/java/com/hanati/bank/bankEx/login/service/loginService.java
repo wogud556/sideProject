@@ -1,5 +1,7 @@
 package com.hanati.bank.bankEx.login.service;
 
+import com.hanati.bank.bankEx.common.exception.BusinessException;
+import com.hanati.bank.bankEx.common.exception.ErrorCode;
 import com.hanati.bank.bankEx.deposit.general.dto.AccountResponse;
 import com.hanati.bank.bankEx.deposit.general.entity.AccountInfo;
 import com.hanati.bank.bankEx.deposit.general.repository.AccountInfoRepository;
@@ -43,6 +45,10 @@ public class loginService {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다");
         }
 
+        if (request.getAccountPassword() == null || request.getAccountPassword().isBlank()) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST);
+        }
+
         UserInfo user = UserInfo.builder()
                 .userId(request.getUserId())
                 .password(request.getPassword())
@@ -61,6 +67,9 @@ public class loginService {
                 .accountName("입출금통장")
                 .balance(0L)
                 .accountStatus("ACTIVE")
+                .accountPassword(request.getAccountPassword())
+                .perTransferLimit(5_000_000L)
+                .dailyTransferLimit(10_000_000L)
                 .createdAt(LocalDateTime.now())
                 .build();
         accountInfoRepository.save(account);

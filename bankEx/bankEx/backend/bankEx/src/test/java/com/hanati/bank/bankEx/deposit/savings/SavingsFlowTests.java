@@ -55,7 +55,7 @@ class SavingsFlowTests {
     private SavingsProductMapper savingsProductMapper;
 
     private String signupAndFundAccount(String userId, long depositAmount) {
-        String accountNumber = loginService.signup(new SignupRequest(userId, "pw1234", "홍길동", "01012345678"))
+        String accountNumber = loginService.signup(new SignupRequest(userId, "pw1234", "홍길동", "01012345678", "1234"))
                 .getAccountNumber();
         transService.deposit(accountNumber, new DepositRequest(depositAmount, "테스트 입금"));
         return accountNumber;

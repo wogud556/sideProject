@@ -7,8 +7,8 @@ import {
   applyLoanApi,
   type LoanProductResponse,
   type LoanApplicationResponse,
-} from '../api/bank_api'
-import { path } from '../router/path'
+} from '../../../api/bank_api'
+import { path } from '../../../router/path'
 
 type Screen = 'list' | 'apply' | 'result'
 

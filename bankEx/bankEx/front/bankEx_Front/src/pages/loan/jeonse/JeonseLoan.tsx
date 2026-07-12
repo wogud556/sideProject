@@ -10,8 +10,8 @@ import {
   type JeonseLoanApplyResponse,
   type JeonseLoanReviewResponse,
   type JeonseLoanExecuteResponse,
-} from '../api/bank_api'
-import { path } from '../router/path'
+} from '../../../api/bank_api'
+import { path } from '../../../router/path'
 
 type Screen = 'product' | 'apply' | 'result' | 'reviewed' | 'executed'
 

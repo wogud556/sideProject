@@ -7,8 +7,8 @@ import {
   repayLoanApi,
   extractErrorMessage,
   type LoanApplicationResponse,
-} from '../api/bank_api'
-import { path } from '../router/path'
+} from '../../../api/bank_api'
+import { path } from '../../../router/path'
 
 const STATUS_STYLE: Record<string, { background: string; color: string }> = {
   심사중: { background: '#fff3cd', color: '#856404' },

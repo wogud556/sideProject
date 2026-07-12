@@ -52,4 +52,13 @@ public class AccountInfo {
     @Setter
     @Column(name = "CLOSED_AT")
     private LocalDateTime closedAt;
+
+    @Column(name = "ACCOUNT_PASSWORD", length = 255)
+    private String accountPassword;
+
+    @Column(name = "PER_TRANSFER_LIMIT")
+    private Long perTransferLimit;
+
+    @Column(name = "DAILY_TRANSFER_LIMIT")
+    private Long dailyTransferLimit;
 }

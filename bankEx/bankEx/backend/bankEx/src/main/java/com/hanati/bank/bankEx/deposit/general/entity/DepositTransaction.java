@@ -41,4 +41,16 @@ public class DepositTransaction {
 
     @Column(name = "TRANSACTION_AT", nullable = false)
     private LocalDateTime transactionAt;
+
+    @Column(name = "TRANSFER_ID")
+    private Long transferId;
+
+    @Column(name = "TRANSACTION_NUMBER", length = 50, unique = true)
+    private String transactionNumber;
+
+    @Column(name = "BALANCE_BEFORE")
+    private Long balanceBefore;
+
+    @Column(name = "TRANSACTION_STATUS", length = 20)
+    private String transactionStatus;
 }

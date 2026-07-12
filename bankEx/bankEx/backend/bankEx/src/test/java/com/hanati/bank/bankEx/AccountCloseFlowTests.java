@@ -42,7 +42,7 @@ class AccountCloseFlowTests {
     private loanService loanService;
 
     private SignupResponse signup(String userId) {
-        return loginService.signup(new SignupRequest(userId, "pw1234", "홍길동", "01012345678"));
+        return loginService.signup(new SignupRequest(userId, "pw1234", "홍길동", "01012345678", "1234"));
     }
 
     @Test

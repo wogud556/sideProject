@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Input from '../components/Input'
-import { loginApi } from '../api/bank_api'
-import { path } from '../router/path'
+import Input from '../../components/Input'
+import { loginApi } from '../../api/bank_api'
+import { path } from '../../router/path'
 
 export default function Login() {
   const navigate = useNavigate()

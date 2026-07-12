@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getUserProfileApi, openAccountApi, extractErrorMessage, type UserProfileResponse } from '../api/bank_api'
-import { path } from '../router/path'
+import { getUserProfileApi, openAccountApi, extractErrorMessage, type UserProfileResponse } from '../../api/bank_api'
+import { path } from '../../router/path'
 
 export default function MyPage() {
   const navigate = useNavigate()
