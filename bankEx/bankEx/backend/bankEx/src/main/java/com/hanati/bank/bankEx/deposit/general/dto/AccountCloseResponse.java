@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class AccountResponse {
+public class AccountCloseResponse {
     private Long accountId;
     private String accountNumber;
-    private Long balance;
-    private String createdAt;
     private String accountStatus;
+    private String closedAt;
+    private String message;
 }

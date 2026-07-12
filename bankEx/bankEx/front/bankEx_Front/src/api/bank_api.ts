@@ -18,6 +18,15 @@ export interface AccountResponse {
     accountNumber: string
     balance: number
     createdAt: string
+    accountStatus: string
+}
+
+export interface AccountCloseResponse {
+    accountId: number
+    accountNumber: string
+    accountStatus: string
+    closedAt: string
+    message: string
 }
 
 export interface LoanProductResponse {
@@ -243,6 +252,11 @@ export async function withdrawApi(
 
 export async function getTransactionsApi(accountNumber: string): Promise<TransactionResponse[]> {
     const response = await api.get<TransactionResponse[]>(`/accounts/${accountNumber}/transactions`)
+    return response.data
+}
+
+export async function closeAccountApi(accountNumber: string, userId: string): Promise<AccountCloseResponse> {
+    const response = await api.post<AccountCloseResponse>(`/accounts/${accountNumber}/close`, { userId })
     return response.data
 }
 

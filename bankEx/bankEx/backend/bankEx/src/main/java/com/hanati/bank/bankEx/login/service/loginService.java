@@ -77,7 +77,8 @@ public class loginService {
                         a.getAccountId(),
                         a.getAccountNumber(),
                         a.getBalance(),
-                        a.getCreatedAt().toString()
+                        a.getCreatedAt().toString(),
+                        a.getAccountStatus()
                 ))
                 .collect(Collectors.toList());
 

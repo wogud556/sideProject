@@ -111,6 +111,21 @@ public class loanService {
                 .collect(Collectors.toList());
     }
 
+    public boolean hasActiveLoan(String userId, String accountNumber) {
+        return loanApplicationMapper.findByUserId(userId).stream()
+                .filter(loan -> accountNumber.equals(loan.getAccountNumber()))
+                .anyMatch(this::isActiveLoan);
+    }
+
+    private boolean isActiveLoan(LoanApplication loan) {
+        if ("심사중".equals(loan.getStatus()) || "승인".equals(loan.getStatus())) {
+            return true;
+        }
+        return "실행완료".equals(loan.getStatus())
+                && loan.getRemainingBalance() != null
+                && loan.getRemainingBalance() > 0;
+    }
+
     public LoanAccountValidateResponse validateCustomerAccount(String userId, String accountNumber) {
         UserInfo user = userInfoRepository.findById(userId).orElse(null);
         if (user == null) {

@@ -5,6 +5,7 @@ import {
   getTransactionsApi,
   depositApi,
   withdrawApi,
+  closeAccountApi,
   extractErrorMessage,
   type AccountResponse,
   type TransactionResponse,
@@ -31,6 +32,7 @@ export default function AccountDetail() {
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('')
   const [loading, setLoading] = useState(false)
+  const [closing, setClosing] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
 
@@ -77,6 +79,23 @@ export default function AccountDetail() {
     }
   }
 
+  const handleClose = async () => {
+    if (!accountNumber || !user) return
+    if (!window.confirm('계좌를 해지하시겠습니까?')) return
+
+    setClosing(true)
+    setError('')
+    setMessage('')
+    try {
+      await closeAccountApi(accountNumber, user.userId)
+      navigate(path.mypage)
+    } catch (err) {
+      setError(extractErrorMessage(err, '계좌 해지에 실패했습니다'))
+    } finally {
+      setClosing(false)
+    }
+  }
+
   return (
     <div style={styles.container}>
       <div style={styles.card}>
@@ -90,50 +109,67 @@ export default function AccountDetail() {
           </div>
         )}
 
-        <div style={styles.tabRow}>
-          <button
-            onClick={() => { setTab('deposit'); setError(''); setMessage('') }}
-            style={{ ...styles.tabButton, ...(tab === 'deposit' ? styles.tabButtonActive : {}) }}
-          >
-            입금
-          </button>
-          <button
-            onClick={() => { setTab('withdraw'); setError(''); setMessage('') }}
-            style={{ ...styles.tabButton, ...(tab === 'withdraw' ? styles.tabButtonActive : {}) }}
-          >
-            출금
-          </button>
-        </div>
+        {account && account.accountStatus === 'CLOSED' ? (
+          <p style={styles.closedNotice}>해지된 계좌입니다</p>
+        ) : (
+          <>
+            <div style={styles.tabRow}>
+              <button
+                onClick={() => { setTab('deposit'); setError(''); setMessage('') }}
+                style={{ ...styles.tabButton, ...(tab === 'deposit' ? styles.tabButtonActive : {}) }}
+              >
+                입금
+              </button>
+              <button
+                onClick={() => { setTab('withdraw'); setError(''); setMessage('') }}
+                style={{ ...styles.tabButton, ...(tab === 'withdraw' ? styles.tabButtonActive : {}) }}
+              >
+                출금
+              </button>
+            </div>
 
-        <div style={styles.fieldGroup}>
-          <input
-            type="number"
-            placeholder="금액"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            style={styles.input}
-          />
-        </div>
-        <div style={styles.fieldGroup}>
-          <input
-            type="text"
-            placeholder="설명 (선택)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            style={styles.input}
-          />
-        </div>
+            <div style={styles.fieldGroup}>
+              <input
+                type="number"
+                placeholder="금액"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.fieldGroup}>
+              <input
+                type="text"
+                placeholder="설명 (선택)"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                style={styles.input}
+              />
+            </div>
 
-        {error && <p style={styles.error}>{error}</p>}
-        {message && <p style={styles.success}>{message}</p>}
+            {error && <p style={styles.error}>{error}</p>}
+            {message && <p style={styles.success}>{message}</p>}
 
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          style={{ ...styles.button, opacity: loading ? 0.7 : 1 }}
-        >
-          {loading ? '처리 중...' : tab === 'deposit' ? '입금하기' : '출금하기'}
-        </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              style={{ ...styles.button, opacity: loading ? 0.7 : 1 }}
+            >
+              {loading ? '처리 중...' : tab === 'deposit' ? '입금하기' : '출금하기'}
+            </button>
+
+            {account && account.balance !== 0 && (
+              <p style={styles.closeHint}>잔액을 모두 출금한 후 해지할 수 있습니다</p>
+            )}
+            <button
+              onClick={handleClose}
+              disabled={!account || account.balance !== 0 || closing}
+              style={{ ...styles.closeButton, opacity: !account || account.balance !== 0 || closing ? 0.5 : 1 }}
+            >
+              {closing ? '해지 처리 중...' : '계좌 해지'}
+            </button>
+          </>
+        )}
 
         <h4 style={styles.sectionTitle}>거래내역</h4>
         {transactions.length === 0 ? (
@@ -313,5 +349,29 @@ const styles = {
     color: '#2e7d32',
     fontSize: '14px',
     marginBottom: '10px',
+  },
+  closedNotice: {
+    color: '#888',
+    fontSize: '14px',
+    textAlign: 'center' as const,
+    padding: '16px 0',
+    marginBottom: '20px',
+  },
+  closeHint: {
+    color: '#c0392b',
+    fontSize: '12px',
+    marginBottom: '8px',
+  },
+  closeButton: {
+    width: '100%',
+    padding: '12px',
+    borderRadius: '8px',
+    border: '1px solid #c0392b',
+    background: '#fff',
+    color: '#c0392b',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '15px',
+    marginBottom: '20px',
   },
 }
