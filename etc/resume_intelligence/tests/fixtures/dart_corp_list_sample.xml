@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+    <list>
+        <corp_code>00126380</corp_code>
+        <corp_name>삼성전자주식회사</corp_name>
+        <corp_eng_name>SAMSUNG ELECTRONICS CO,.LTD</corp_eng_name>
+        <stock_code>005930</stock_code>
+        <modify_date>20240101</modify_date>
+    </list>
+    <list>
+        <corp_code>00164779</corp_code>
+        <corp_name>한아티주식회사</corp_name>
+        <corp_eng_name>HANATI CO,.LTD</corp_eng_name>
+        <stock_code></stock_code>
+        <modify_date>20240102</modify_date>
+    </list>
+    <list>
+        <corp_code>00401731</corp_code>
+        <corp_name>(주)ABC</corp_name>
+        <corp_eng_name>ABC CO,.LTD</corp_eng_name>
+        <stock_code></stock_code>
+        <modify_date>20240103</modify_date>
+    </list>
+    <list>
+        <corp_code>00500001</corp_code>
+        <corp_name>ABC상사주식회사</corp_name>
+        <corp_eng_name>ABC TRADING CO,.LTD</corp_eng_name>
+        <stock_code></stock_code>
+        <modify_date>20240104</modify_date>
+    </list>
+</result>

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}기업 상세 - Resume Intelligence{% endblock %}
+{% block content %}
+<h1>기업 상세</h1>
+
+{% if profile %}
+<h2>{{ profile.corp_name }}</h2>
+<p>영문명: {{ profile.corp_name_eng|default:"-" }}</p>
+<p>종목코드: {{ profile.stock_code|default:"-" }}</p>
+<p>대표자: {{ profile.ceo_name|default:"-" }}</p>
+<p>주소: {{ profile.address|default:"-" }}</p>
+<p>설립일: {{ profile.est_date|default:"-" }}</p>
+{% elif profile_error %}
+<p class="error">기업개황 조회 실패: {{ profile_error }}</p>
+{% endif %}
+
+<h2>주요 재무정보 ({{ business_year }}년, 사업보고서)</h2>
+{% if financials %}
+<p>재무제표 구분: {{ financials.fs_div }}</p>
+<table>
+    <thead><tr><th>계정</th><th>금액</th><th>원본 계정명</th></tr></thead>
+    <tbody>
+        {% for account in financials.accounts %}
+        <tr>
+            <td>{{ account.canonical_name }}</td>
+            <td>{{ account.amount }}</td>
+            <td>{{ account.raw_account_name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% elif financials_error %}
+<p class="error">재무정보 조회 실패: {{ financials_error }}</p>
+{% endif %}
+
+<p class="notice">{{ source_notice }}</p>
+{% endblock %}

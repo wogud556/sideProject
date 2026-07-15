@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}이력서 업로드 - Resume Intelligence{% endblock %}
+{% block content %}
+<h1>이력서 업로드</h1>
+
+<p class="notice">
+    PDF 파일만 업로드할 수 있습니다 (최대 20MB, 최대 30페이지, 암호화되지 않은 파일).<br>
+    업로드된 이력서에서 추출한 이름·이메일·전화번호 등 개인정보는 본인 계정에서만 조회할 수 있으며,
+    분석을 위한 목적으로만 사용됩니다.
+</p>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <p>
+        {{ form.file.label_tag }}
+        {{ form.file }}
+        {{ form.file.errors }}
+    </p>
+    <button type="submit">업로드 및 분석</button>
+</form>
+{% endblock %}

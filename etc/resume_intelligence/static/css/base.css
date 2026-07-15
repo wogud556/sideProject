@@ -1,0 +1,59 @@
+body {
+    font-family: -apple-system, "Malgun Gothic", sans-serif;
+    margin: 0;
+    color: #212529;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: #1c3d5a;
+    color: #fff;
+}
+
+.app-header a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 12px;
+}
+
+.app-title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-left: 0 !important;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.app-main {
+    padding: 24px;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.messages {
+    list-style: none;
+    padding: 8px 24px;
+    margin: 0;
+}
+
+.messages .error {
+    color: #b00020;
+}
+
+.messages .success {
+    color: #2e7d32;
+}
+
+.field-error {
+    color: #b00020;
+    font-size: 0.9rem;
+}
+
+form p {
+    margin: 8px 0;
+}

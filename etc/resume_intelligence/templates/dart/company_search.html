@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}기업 매칭 - Resume Intelligence{% endblock %}
+{% block content %}
+<h1>기업 매칭</h1>
+<p><a href="{% url 'resumes:detail' resume_id=resume_id %}#careers">← 이력서로 돌아가기</a></p>
+
+<p>경력: <strong>{{ career.company_name_raw }}</strong></p>
+<p>현재 매칭 상태: {{ career.dart_match_status }}
+    {% if career.dart_corp_code %}(corp_code: {{ career.dart_corp_code }}){% endif %}</p>
+
+{% if career.dart_corp_code %}
+<form method="post" class="inline-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="unlink">
+    <button type="submit">연결 해제</button>
+</form>
+{% endif %}
+
+<form method="get">
+    <input type="text" name="keyword" value="{{ keyword }}" placeholder="기업명으로 검색">
+    <button type="submit">검색</button>
+</form>
+
+{% if search_result.status == "ERROR" %}
+<p class="error">{{ search_result.message }}</p>
+{% endif %}
+
+{% if search_result.status == "MATCHED_AUTO" %}
+<p class="success">
+    자동 매칭 후보를 찾았습니다: {{ search_result.candidates.0.corp_name }}
+    ({{ search_result.candidates.0.corp_code }})
+</p>
+<form method="post" class="inline-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="confirm_auto">
+    <input type="hidden" name="corp_code" value="{{ search_result.candidates.0.corp_code }}">
+    <button type="submit">자동 매칭 연결하기</button>
+</form>
+{% endif %}
+
+<h2>후보</h2>
+{% if search_result.candidates %}
+<table>
+    <thead><tr><th>기업명</th><th>종목코드</th><th>유사도</th><th></th></tr></thead>
+    <tbody>
+        {% for candidate in search_result.candidates %}
+        <tr>
+            <td>{{ candidate.corp_name }}</td>
+            <td>{{ candidate.stock_code }}</td>
+            <td>{{ candidate.similarity }}</td>
+            <td>
+                <form method="post" class="inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="select">
+                    <input type="hidden" name="corp_code" value="{{ candidate.corp_code }}">
+                    <button type="submit">연결</button>
+                </form>
+                <a href="{% url 'dart:company_detail' corp_code=candidate.corp_code %}">상세보기</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>후보 기업이 없습니다.</p>
+{% endif %}
+{% endblock %}

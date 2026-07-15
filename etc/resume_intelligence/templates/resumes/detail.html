@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}이력서 상세 - Resume Intelligence{% endblock %}
+{% block content %}
+<h1>{{ document.original_filename }}</h1>
+
+<p>
+    상태: <strong>{{ document.analysis_status }}</strong>
+    {% if document.ocr_used %}(OCR 적용됨){% endif %}
+    {% if profile.is_user_confirmed %}<span class="success">확인 완료</span>{% endif %}
+</p>
+
+{% if document.warnings %}
+<ul class="messages">
+    {% for warning in document.warnings %}
+    <li class="error">{{ warning }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if document.error_message %}
+<p class="error">{{ document.error_message }}</p>
+{% endif %}
+
+<nav class="tabs">
+    <a href="#basic">기본정보</a> |
+    <a href="#careers">경력</a> |
+    <a href="#educations">학력</a> |
+    <a href="#projects">프로젝트</a> |
+    <a href="#certificates">자격증</a> |
+    <a href="#skills">기술</a> |
+    <a href="#languages">어학</a> |
+    <a href="#raw-text">원본 텍스트</a>
+</nav>
+
+<div class="actions">
+    <a href="{% url 'resumes:pdf' resume_id=resume_id %}">원본 PDF 보기</a>
+    <a href="{% url 'resumes:excel' resume_id=resume_id %}">Excel 다운로드</a>
+    <form method="post" action="{% url 'resumes:reanalyze' resume_id=resume_id %}" class="inline-form">
+        {% csrf_token %}
+        <button type="submit">재분석</button>
+    </form>
+    <form method="post" action="{% url 'resumes:confirm' resume_id=resume_id %}" class="inline-form">
+        {% csrf_token %}
+        <button type="submit">확인 완료</button>
+    </form>
+    <form method="post" action="{% url 'resumes:delete' resume_id=resume_id %}" class="inline-form">
+        {% csrf_token %}
+        <button type="submit">삭제</button>
+    </form>
+</div>
+
+<section id="basic">
+    <h2>기본정보</h2>
+    <form method="post" action="{% url 'resumes:basic_edit' resume_id=resume_id %}">
+        {% csrf_token %}
+        <p>이름: <input type="text" name="name" value="{{ profile.basic.name.value|default:'' }}">
+            {% if profile.basic.name.review_required %}<span class="error">검토필요</span>{% endif %}</p>
+        <p>이메일: <input type="text" name="email" value="{{ profile.basic.email.value|default:'' }}">
+            {% if profile.basic.email.review_required %}<span class="error">검토필요</span>{% endif %}</p>
+        <p>전화: <input type="text" name="phone" value="{{ profile.basic.phone.value|default:'' }}">
+            {% if profile.basic.phone.review_required %}<span class="error">검토필요</span>{% endif %}</p>
+        <p>주소: <input type="text" name="address" value="{{ profile.basic.address.value|default:'' }}"></p>
+        <button type="submit">저장</button>
+    </form>
+</section>
+
+<section id="careers">
+    <h2>경력</h2>
+    {% for career in profile.careers %}
+    <div class="record">
+        <p><strong>{{ career.company_name_raw }}</strong> ({{ career.start_date|default:"?" }} ~ {% if career.is_current %}재직중{% else %}{{ career.end_date|default:"?" }}{% endif %})</p>
+        <p>신뢰도: {{ career.confidence }} {% if career.review_required %}<span class="error">검토필요</span>{% endif %}</p>
+        <p>DART 매칭 상태: {{ career.dart_match_status }}
+            <a href="{% url 'dart:career_search' resume_id=resume_id index=forloop.counter0 %}">기업 매칭</a></p>
+        <form method="post" action="{% url 'resumes:career_delete' resume_id=resume_id index=forloop.counter0 %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit">삭제</button>
+        </form>
+    </div>
+    {% empty %}
+    <p>등록된 경력이 없습니다.</p>
+    {% endfor %}
+
+    <form method="post" action="{% url 'resumes:career_add' resume_id=resume_id %}">
+        {% csrf_token %}
+        <p>회사명: <input type="text" name="company_name_raw"></p>
+        <p>부서: <input type="text" name="department"></p>
+        <p>직급: <input type="text" name="position"></p>
+        <p>시작일(YYYY-MM): <input type="text" name="start_date"></p>
+        <p>종료일(YYYY-MM): <input type="text" name="end_date"></p>
+        <p>재직중: <input type="checkbox" name="is_current"></p>
+        <p>주요업무(줄바꿈으로 구분): <textarea name="responsibilities"></textarea></p>
+        <button type="submit">경력 추가</button>
+    </form>
+</section>
+
+<section id="educations">
+    <h2>학력</h2>
+    {% for education in profile.educations %}
+    <div class="record">
+        <p><strong>{{ education.school_name }}</strong> {{ education.major|default:"" }} ({{ education.start_date|default:"?" }} ~ {{ education.end_date|default:"?" }})</p>
+        <form method="post" action="{% url 'resumes:education_delete' resume_id=resume_id index=forloop.counter0 %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit">삭제</button>
+        </form>
+    </div>
+    {% empty %}
+    <p>등록된 학력이 없습니다.</p>
+    {% endfor %}
+
+    <form method="post" action="{% url 'resumes:education_add' resume_id=resume_id %}">
+        {% csrf_token %}
+        <p>학교명: <input type="text" name="school_name"></p>
+        <p>전공: <input type="text" name="major"></p>
+        <p>학위: <input type="text" name="degree"></p>
+        <p>시작일(YYYY-MM): <input type="text" name="start_date"></p>
+        <p>종료일(YYYY-MM): <input type="text" name="end_date"></p>
+        <button type="submit">학력 추가</button>
+    </form>
+</section>
+
+<section id="projects">
+    <h2>프로젝트</h2>
+    {% for project in profile.projects %}
+    <p><strong>{{ project.project_name }}</strong> ({{ project.start_date|default:"?" }} ~ {{ project.end_date|default:"?" }})</p>
+    {% empty %}
+    <p>등록된 프로젝트가 없습니다.</p>
+    {% endfor %}
+</section>
+
+<section id="certificates">
+    <h2>자격증</h2>
+    {% for certificate in profile.certificates %}
+    <p><strong>{{ certificate.certificate_name }}</strong> - {{ certificate.issuer|default:"" }} ({{ certificate.acquired_date|default:"?" }})</p>
+    {% empty %}
+    <p>등록된 자격증이 없습니다.</p>
+    {% endfor %}
+</section>
+
+<section id="skills">
+    <h2>기술</h2>
+    <p>{% for skill in profile.skills %}{{ skill.name }}{% if not forloop.last %}, {% endif %}{% empty %}등록된 기술이 없습니다.{% endfor %}</p>
+</section>
+
+<section id="languages">
+    <h2>어학</h2>
+    {% for language in profile.languages %}
+    <p>{{ language.test_name|default:language.language }} {{ language.score|default:"" }} ({{ language.acquired_date|default:"?" }})</p>
+    {% empty %}
+    <p>등록된 어학 정보가 없습니다.</p>
+    {% endfor %}
+</section>
+
+<section id="raw-text">
+    <h2>원본 텍스트</h2>
+    {% for block in blocks %}
+    <p><small>p.{{ block.page }} [{{ block.method }}]</small> {{ block.text }}</p>
+    {% empty %}
+    <p>추출된 텍스트가 없습니다.</p>
+    {% endfor %}
+</section>
+{% endblock %}

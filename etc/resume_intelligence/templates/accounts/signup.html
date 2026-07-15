@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}회원가입 - Resume Intelligence{% endblock %}
+{% block content %}
+<h1>회원가입</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <p>
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {{ form.username.errors }}
+    </p>
+    <p>
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        {{ form.email.errors }}
+    </p>
+    <p>
+        {{ form.password.label_tag }}
+        {{ form.password }}
+        {{ form.password.errors }}
+    </p>
+    <p>
+        {{ form.password_confirm.label_tag }}
+        {{ form.password_confirm }}
+        {{ form.password_confirm.errors }}
+    </p>
+    <button type="submit">가입하기</button>
+</form>
+<p><a href="{% url 'accounts:login' %}">로그인</a></p>
+{% endblock %}

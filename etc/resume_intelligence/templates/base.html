@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Resume Intelligence{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body>
+    <header class="app-header">
+        <a href="/" class="app-title">Resume Intelligence</a>
+        <nav>
+            {% if current_user %}
+                <a href="{% url 'resumes:dashboard' %}">대시보드</a>
+                <a href="{% url 'resumes:upload' %}">업로드</a>
+                <span>{{ current_user.username }}</span>
+                <form method="post" action="{% url 'accounts:logout' %}" class="inline-form">
+                    {% csrf_token %}
+                    <button type="submit">로그아웃</button>
+                </form>
+            {% else %}
+                <a href="{% url 'accounts:login' %}">로그인</a>
+                <a href="{% url 'accounts:signup' %}">회원가입</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <main class="app-main">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
