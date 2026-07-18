@@ -1,59 +1,338 @@
+:root {
+    --bg: #f4f8fd;
+    --surface: #ffffff;
+    --border: #dde7f3;
+    --text: #2b3a4d;
+    --text-muted: #7b8ba0;
+    --accent: #2f8af5;
+    --accent-hover: #1c74dd;
+    --accent-soft: #e6f1fe;
+    --danger: #d6455d;
+    --danger-soft: #fdecef;
+    --success: #2f9e6e;
+    --success-soft: #e7f7f0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: -apple-system, "Malgun Gothic", sans-serif;
     margin: 0;
-    color: #212529;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
 }
+
+/* ---------- Header ---------- */
 
 .app-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 24px;
-    background: #1c3d5a;
-    color: #fff;
+    padding: 14px 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 6px rgba(47, 138, 245, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .app-header a {
-    color: #fff;
+    color: var(--text);
     text-decoration: none;
-    margin-left: 12px;
+    margin-left: 16px;
+    font-size: 0.95rem;
+    transition: color 0.15s;
+}
+
+.app-header a:hover {
+    color: var(--accent);
+}
+
+.app-header nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.app-header nav span {
+    margin-left: 16px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
 }
 
 .app-title {
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     margin-left: 0 !important;
+    color: var(--accent) !important;
+}
+
+.app-header button {
+    margin-left: 16px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+}
+
+.app-header button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+}
+
+/* ---------- Layout ---------- */
+
+.app-main {
+    padding: 32px 24px 64px;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 1.6rem;
+    margin: 0 0 20px;
+}
+
+h2 {
+    font-size: 1.15rem;
+    margin: 32px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent-soft);
+}
+
+a {
+    color: var(--accent);
+}
+
+a:hover {
+    color: var(--accent-hover);
+}
+
+/* ---------- Messages ---------- */
+
+.messages {
+    list-style: none;
+    padding: 12px 24px 0;
+    margin: 0;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.messages li {
+    padding: 10px 16px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.messages .error {
+    color: var(--danger);
+    background: var(--danger-soft);
+}
+
+.messages .success {
+    color: var(--success);
+    background: var(--success-soft);
+}
+
+.field-error,
+.error {
+    color: var(--danger);
+    font-size: 0.9rem;
+}
+
+.success {
+    color: var(--success);
+}
+
+.errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0;
+    color: var(--danger);
+    font-size: 0.9rem;
+}
+
+.notice {
+    background: var(--accent-soft);
+    color: var(--text);
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 0.92rem;
+}
+
+/* ---------- Forms ---------- */
+
+form p {
+    margin: 12px 0;
+}
+
+label {
+    display: inline-block;
+    margin-bottom: 4px;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="file"],
+textarea {
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--text);
+    width: 100%;
+    max-width: 360px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(47, 138, 245, 0.15);
+}
+
+button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+button:hover {
+    background: var(--accent-hover);
 }
 
 .inline-form {
     display: inline;
 }
 
-.app-main {
-    padding: 24px;
-    max-width: 720px;
-    margin: 0 auto;
+.inline-form button {
+    padding: 6px 14px;
+    font-size: 0.85rem;
 }
 
-.messages {
+/* ---------- Tables ---------- */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(47, 138, 245, 0.06);
+}
+
+th,
+td {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 0.92rem;
+}
+
+thead th {
+    background: var(--accent-soft);
+    color: var(--text);
+    font-weight: 600;
+}
+
+tbody tr {
+    border-top: 1px solid var(--border);
+}
+
+tbody tr:hover {
+    background: #f7fafd;
+}
+
+/* ---------- Dashboard stats ---------- */
+
+.stats {
     list-style: none;
-    padding: 8px 24px;
-    margin: 0;
+    padding: 0;
+    margin: 0 0 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-.messages .error {
-    color: #b00020;
+.stats li {
+    flex: 1 1 120px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    font-size: 0.95rem;
+    box-shadow: 0 1px 4px rgba(47, 138, 245, 0.06);
 }
 
-.messages .success {
-    color: #2e7d32;
-}
+/* ---------- Detail page ---------- */
 
-.field-error {
-    color: #b00020;
+.tabs {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin: 16px 0;
     font-size: 0.9rem;
+    color: var(--border);
 }
 
-form p {
-    margin: 8px 0;
+.tabs a {
+    text-decoration: none;
+    margin: 0 2px;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin: 16px 0 8px;
+}
+
+section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    box-shadow: 0 1px 4px rgba(47, 138, 245, 0.06);
+}
+
+section h2 {
+    margin-top: 0;
+}
+
+.record {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    background: #fafcfe;
+}
+
+.record p {
+    margin: 4px 0;
 }

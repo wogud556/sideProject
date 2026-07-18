@@ -109,8 +109,38 @@ brew install tesseract tesseract-lang   # 한국어(kor) 언어팩 포함
 sudo apt-get install tesseract-ocr tesseract-ocr-kor
 ```
 
+Windows는 UB Mannheim 설치 파일(https://github.com/UB-Mannheim/tesseract/wiki)을
+실행하고, 설치 중 "Additional language data" 단계에서 **Korean**을 체크한 뒤,
+시스템 환경변수 PATH에 `C:\Program Files\Tesseract-OCR`를 추가한다
+(새 명령 창에서 `tesseract --version`이 출력되면 성공).
+
 설치 여부는 앱 재시작 없이도 첫 OCR 시도 시 자동 감지된다(프로세스 내
 1회 캐시).
+
+### Windows에서 실행
+
+코드는 수정 없이 Windows에서 동작한다 (모든 파일 IO가 UTF-8 명시,
+`pathlib` 경로 사용). 단, macOS/Linux에서 만든 `.venv` 폴더는 해당 OS 전용
+바이너리이므로 Windows에서는 가상환경을 새로 만들어야 한다.
+
+1. python.org 에서 Python 3.12 이상 설치 — 설치 첫 화면에서
+   **"Add python.exe to PATH" 반드시 체크**
+2. 프로젝트를 복사할 때 `.venv/` 폴더는 제외 (git clone 권장)
+3. 명령 프롬프트/PowerShell에서:
+
+```bat
+cd resume_intelligence
+py -3.12 -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+copy .env.example .env
+
+python manage.py check
+python manage.py runserver
+```
+
+이후 사용법(브라우저 접속, DART 동기화, 테스트 실행)은 위와 동일하다.
 
 ## 5. 환경변수 (`.env`)
 
