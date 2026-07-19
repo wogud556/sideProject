@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>박재형 | Profile</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased">
+
+  <!-- Nav -->
+  <nav class="fixed top-0 inset-x-0 z-50 backdrop-blur bg-slate-950/70 border-b border-white/5">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <span class="font-semibold tracking-tight">박재형</span>
+      <div class="hidden sm:flex gap-8 text-sm text-slate-300">
+        <a href="#about" class="hover:text-white transition-colors">About</a>
+        <a href="#skills" class="hover:text-white transition-colors">Skills</a>
+        <a href="#projects" class="hover:text-white transition-colors">Projects</a>
+        <a href="#contact" class="hover:text-white transition-colors">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header id="about" class="relative overflow-hidden pt-40 pb-28 px-6">
+    <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.25),_transparent_60%)]"></div>
+    <div class="max-w-5xl mx-auto text-center">
+      <p class="text-indigo-400 font-medium mb-4 fade-up">Hello, I'm</p>
+      <h1 class="text-5xl sm:text-6xl font-bold tracking-tight mb-6 fade-up">박재형</h1>
+      <p class="text-lg text-slate-400 mb-2 fade-up">하나원큐 앱 SM 개발</p>
+      <p class="max-w-xl mx-auto text-slate-300 fade-up">
+        클로드를 조금 더 알고싶은 응애 개발자입니다.
+      </p>
+      <div class="mt-10 flex justify-center gap-4 fade-up">
+        <a href="#projects" class="px-6 py-3 rounded-full bg-indigo-500 hover:bg-indigo-400 transition-colors font-medium text-sm">프로젝트 보기</a>
+        <a href="#contact" class="px-6 py-3 rounded-full border border-white/15 hover:border-white/40 transition-colors font-medium text-sm">연락하기</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Skills -->
+  <section id="skills" class="py-24 px-6 border-t border-white/5">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-14">기술 스택</h2>
+      <div class="grid sm:grid-cols-3 gap-6">
+
+        <div class="rounded-2xl bg-slate-900/60 border border-white/5 p-8 hover:border-indigo-400/40 transition-colors">
+          <h3 class="text-indigo-400 font-semibold mb-4 text-sm tracking-wide uppercase">Frontend</h3>
+          <ul class="space-y-2 text-slate-200">
+            <li>React</li>
+            <li>Node</li>
+          </ul>
+        </div>
+
+        <div class="rounded-2xl bg-slate-900/60 border border-white/5 p-8 hover:border-indigo-400/40 transition-colors">
+          <h3 class="text-indigo-400 font-semibold mb-4 text-sm tracking-wide uppercase">Backend</h3>
+          <ul class="space-y-2 text-slate-200">
+            <li>Java</li>
+            <li>Kotlin</li>
+          </ul>
+        </div>
+
+        <div class="rounded-2xl bg-slate-900/60 border border-white/5 p-8 hover:border-indigo-400/40 transition-colors">
+          <h3 class="text-indigo-400 font-semibold mb-4 text-sm tracking-wide uppercase">SQL</h3>
+          <ul class="space-y-2 text-slate-200">
+            <li>Oracle</li>
+            <li>MySQL</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects" class="py-24 px-6 border-t border-white/5 bg-slate-900/30">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-14">프로젝트 / 포트폴리오</h2>
+      <div class="grid sm:grid-cols-2 gap-6">
+
+        <article class="rounded-2xl bg-slate-900/60 border border-white/5 p-8 flex flex-col">
+          <span class="text-xs font-medium text-indigo-400 mb-2">Web · Banking</span>
+          <h3 class="text-xl font-semibold mb-2">BankEx</h3>
+          <p class="text-slate-400 text-sm flex-1">
+            KB국민은행 기능을 시뮬레이션하는 풀스택 뱅킹 웹 애플리케이션.
+            React 19 + TypeScript + Vite 프론트엔드, Spring Boot + Java 백엔드로 구성.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <span class="px-3 py-1 rounded-full bg-white/5 text-xs text-slate-300">React</span>
+            <span class="px-3 py-1 rounded-full bg-white/5 text-xs text-slate-300">Spring Boot</span>
+            <span class="px-3 py-1 rounded-full bg-white/5 text-xs text-slate-300">Oracle</span>
+          </div>
+        </article>
+
+        <article class="rounded-2xl bg-slate-900/60 border border-white/5 p-8 flex flex-col">
+          <span class="text-xs font-medium text-indigo-400 mb-2">Study</span>
+          <h3 class="text-xl font-semibold mb-2">Claude 활용 학습</h3>
+          <p class="text-slate-400 text-sm flex-1">
+            Claude Code와 AI 도구를 실무에 적용하기 위한 개인 학습 프로젝트.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <span class="px-3 py-1 rounded-full bg-white/5 text-xs text-slate-300">AI</span>
+            <span class="px-3 py-1 rounded-full bg-white/5 text-xs text-slate-300">Automation</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="py-24 px-6 border-t border-white/5 text-center">
+    <div class="max-w-md mx-auto">
+      <h2 class="text-3xl font-bold mb-6">Contact</h2>
+      <p class="text-slate-400 mb-8">궁금한 점이 있으면 언제든 연락 주세요.</p>
+      <a href="mailto:wogud556@naver.com" id="contact-email" class="inline-block px-6 py-3 rounded-full bg-indigo-500 hover:bg-indigo-400 transition-colors font-medium text-sm">
+        wogud556@naver.com
+      </a>
+    </div>
+  </section>
+
+  <footer class="py-8 text-center text-xs text-slate-500 border-t border-white/5">
+    © 2026 박재형. All rights reserved.
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
