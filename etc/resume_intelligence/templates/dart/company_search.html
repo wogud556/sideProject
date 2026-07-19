@@ -55,7 +55,7 @@
                     <input type="hidden" name="corp_code" value="{{ candidate.corp_code }}">
                     <button type="submit">연결</button>
                 </form>
-                <a href="{% url 'dart:company_detail' corp_code=candidate.corp_code %}">상세보기</a>
+                <a href="{% url 'dart:company_detail' corp_code=candidate.corp_code %}" data-loading>상세보기</a>
             </td>
         </tr>
         {% endfor %}

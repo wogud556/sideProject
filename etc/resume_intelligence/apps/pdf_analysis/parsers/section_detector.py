@@ -17,6 +17,7 @@ class SectionType(str, Enum):
     CERTIFICATE = "CERTIFICATE"
     SKILL = "SKILL"
     LANGUAGE = "LANGUAGE"
+    SELF_INTRO = "SELF_INTRO"
 
 
 _SECTION_KEYWORDS: dict[SectionType, list[str]] = {
@@ -26,6 +27,10 @@ _SECTION_KEYWORDS: dict[SectionType, list[str]] = {
     SectionType.CERTIFICATE: ["자격증", "자격 사항", "자격사항", "자격면허", "Certificates", "Certifications", "Certificate"],
     SectionType.SKILL: ["기술", "기술 스택", "기술스택", "보유기술", "Skills", "Tech Stack", "Technical Skills"],
     SectionType.LANGUAGE: ["어학", "어학 능력", "외국어", "Languages", "Language"],
+    SectionType.SELF_INTRO: [
+        "자기소개서", "자기 소개서", "자소서", "자기소개", "자기 소개",
+        "Cover Letter", "Self Introduction", "Self-Introduction",
+    ],
 }
 
 MAX_HEADER_LENGTH = 20
@@ -50,6 +55,28 @@ def match_section_header(text: str) -> SectionType | None:
         if normalized_lower in keyword_set:
             return section
     return None
+
+
+def exclude_section_blocks(
+    blocks: list[ExtractedBlock], excluded: set[SectionType]
+) -> list[ExtractedBlock]:
+    """excluded 섹션의 헤더 블록과 본문 블록을 제거한 목록을 반환한다.
+
+    제외 구간은 해당 섹션 헤더부터 다음 섹션 헤더 직전까지다. 다른 섹션의
+    헤더 블록은 기존 동작대로 유지한다.
+    """
+    kept: list[ExtractedBlock] = []
+    current_section = SectionType.BASIC
+
+    for block in sorted(blocks, key=lambda b: (b.page, b.order)):
+        matched = match_section_header(block.text)
+        if matched is not None:
+            current_section = matched
+        if current_section in excluded:
+            continue
+        kept.append(block)
+
+    return kept
 
 
 def detect_sections(document: ExtractedDocument) -> dict[SectionType, list[ExtractedBlock]]:

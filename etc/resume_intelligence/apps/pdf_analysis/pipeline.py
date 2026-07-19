@@ -7,6 +7,7 @@ from .extractors.base import PdfExtractor
 from .extractors.hybrid_extractor import HybridExtractor
 from .parsers.base import ResumeParser
 from .parsers.rule_based_parser import RuleBasedResumeParser
+from .parsers.section_detector import SectionType, exclude_section_blocks
 from .schemas.document import AnalysisStatus, ExtractedBlock
 from .schemas.profile import ResumeProfile
 
@@ -37,6 +38,8 @@ def run_pipeline(
     parser = parser or RuleBasedResumeParser()
 
     document = extractor.extract(file_path)
+    # 자기소개서 섹션은 구조화 대상이 아니므로 파싱 입력과 결과 블록 모두에서 제외한다.
+    document.blocks = exclude_section_blocks(document.blocks, {SectionType.SELF_INTRO})
     warnings = list(document.warnings)
 
     parse_result = parser.parse(document)

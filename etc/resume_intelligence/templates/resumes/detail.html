@@ -71,7 +71,7 @@
         <p><strong>{{ career.company_name_raw }}</strong> ({{ career.start_date|default:"?" }} ~ {% if career.is_current %}재직중{% else %}{{ career.end_date|default:"?" }}{% endif %})</p>
         <p>신뢰도: {{ career.confidence }} {% if career.review_required %}<span class="error">검토필요</span>{% endif %}</p>
         <p>DART 매칭 상태: {{ career.dart_match_status }}
-            <a href="{% url 'dart:career_search' resume_id=resume_id index=forloop.counter0 %}">기업 매칭</a></p>
+            <a href="{% url 'dart:career_search' resume_id=resume_id index=forloop.counter0 %}" data-loading>기업 매칭</a></p>
         <form method="post" action="{% url 'resumes:career_delete' resume_id=resume_id index=forloop.counter0 %}" class="inline-form">
             {% csrf_token %}
             <button type="submit">삭제</button>

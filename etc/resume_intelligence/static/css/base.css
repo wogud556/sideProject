@@ -336,3 +336,49 @@ section h2 {
 .record p {
     margin: 4px 0;
 }
+
+/* ---------- Loading overlay ---------- */
+
+#loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(43, 58, 77, 0.45);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+
+#loading-overlay.active {
+    display: flex;
+}
+
+.loading-box {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 28px 36px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.loading-box p {
+    margin: 16px 0 0;
+    font-size: 0.95rem;
+    color: var(--text);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border: 4px solid var(--accent-soft);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: loading-spin 0.8s linear infinite;
+}
+
+@keyframes loading-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

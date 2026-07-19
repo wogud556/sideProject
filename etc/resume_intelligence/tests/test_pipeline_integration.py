@@ -32,6 +32,41 @@ class RunPipelineWithTextPdfTests(SimpleTestCase):
         self.assertEqual(len(result.profile.careers), 2)
 
 
+class RunPipelineExcludesSelfIntroTests(SimpleTestCase):
+    """자기소개서 섹션은 파싱 입력과 결과 블록 모두에서 제외돼야 한다."""
+
+    def setUp(self):
+        self.tmp_dir = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.tmp_dir, ignore_errors=True)
+
+    def test_self_intro_section_is_excluded_from_result(self):
+        path = self.tmp_dir / "with_self_intro.pdf"
+        path.write_bytes(
+            build_text_resume_pdf(
+                [
+                    "홍길동",
+                    "email: hong@example.com",
+                    "경력",
+                    "ABC주식회사 백엔드 개발자",
+                    "2020.03 ~ 2022.05",
+                    "- 결제 시스템 개발",
+                    "자기소개서",
+                    "저는 성실한 개발자입니다.",
+                    "어려서부터 컴퓨터를 좋아했습니다.",
+                ]
+            )
+        )
+
+        result = run_pipeline(str(path))
+
+        texts = [b.text for b in result.blocks]
+        self.assertTrue(any("ABC주식회사" in t for t in texts))
+        self.assertFalse(any("자기소개서" in t for t in texts))
+        self.assertFalse(any("성실한 개발자" in t for t in texts))
+        self.assertFalse(any("컴퓨터를 좋아했습니다" in t for t in texts))
+        self.assertEqual(len(result.profile.careers), 1)
+
+
 class RunPipelineWithMalformedContactInfoTests(SimpleTestCase):
     """경계: 이메일/전화 형식이 이상한 이력서도 파이프라인이 죽지 않고
     완료돼야 한다(값을 잘못 추출하지 않고 None으로 남기는 것이 안전한 동작)."""

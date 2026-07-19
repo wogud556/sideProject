@@ -1,6 +1,11 @@
 from django.test import SimpleTestCase
 
-from apps.pdf_analysis.parsers.section_detector import SectionType, detect_sections, match_section_header
+from apps.pdf_analysis.parsers.section_detector import (
+    SectionType,
+    detect_sections,
+    exclude_section_blocks,
+    match_section_header,
+)
 from apps.pdf_analysis.schemas.document import ExtractedBlock, ExtractedDocument
 
 
@@ -18,6 +23,8 @@ class MatchSectionHeaderTests(SimpleTestCase):
         self.assertEqual(match_section_header("자격증"), SectionType.CERTIFICATE)
         self.assertEqual(match_section_header("기술 스택"), SectionType.SKILL)
         self.assertEqual(match_section_header("어학"), SectionType.LANGUAGE)
+        self.assertEqual(match_section_header("자기소개서"), SectionType.SELF_INTRO)
+        self.assertEqual(match_section_header("자소서"), SectionType.SELF_INTRO)
 
     def test_matches_english_variants_case_insensitive(self):
         self.assertEqual(match_section_header("Work Experience"), SectionType.CAREER)
@@ -93,3 +100,36 @@ class DetectSectionsTests(SimpleTestCase):
             [b.text for b in sections[SectionType.BASIC]],
             ["first page first line", "first page second line", "second page line"],
         )
+
+
+class ExcludeSectionBlocksTests(SimpleTestCase):
+    def test_removes_self_intro_header_and_content(self):
+        blocks = [
+            _block(1, 0, "홍길동"),
+            _block(1, 1, "경력"),
+            _block(1, 2, "ABC주식회사"),
+            _block(1, 3, "자기소개서"),
+            _block(1, 4, "저는 성실한 개발자입니다."),
+            _block(1, 5, "어려서부터 컴퓨터를 좋아했습니다."),
+        ]
+        kept = exclude_section_blocks(blocks, {SectionType.SELF_INTRO})
+        self.assertEqual([b.text for b in kept], ["홍길동", "경력", "ABC주식회사"])
+
+    def test_exclusion_stops_at_next_section_header(self):
+        blocks = [
+            _block(1, 0, "자기소개서"),
+            _block(1, 1, "저는 성실한 개발자입니다."),
+            _block(1, 2, "학력"),
+            _block(1, 3, "한국대학교"),
+        ]
+        kept = exclude_section_blocks(blocks, {SectionType.SELF_INTRO})
+        self.assertEqual([b.text for b in kept], ["학력", "한국대학교"])
+
+    def test_no_self_intro_section_keeps_all_blocks(self):
+        blocks = [
+            _block(1, 0, "홍길동"),
+            _block(1, 1, "경력"),
+            _block(1, 2, "ABC주식회사"),
+        ]
+        kept = exclude_section_blocks(blocks, {SectionType.SELF_INTRO})
+        self.assertEqual(len(kept), 3)
