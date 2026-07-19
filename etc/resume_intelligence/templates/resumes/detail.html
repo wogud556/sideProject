@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load resume_extras %}
 {% block title %}이력서 상세 - Resume Intelligence{% endblock %}
 {% block content %}
 <h1>{{ document.original_filename }}</h1>
@@ -28,13 +29,13 @@
     <a href="#projects">프로젝트</a> |
     <a href="#certificates">자격증</a> |
     <a href="#skills">기술</a> |
-    <a href="#languages">어학</a> |
-    <a href="#raw-text">원본 텍스트</a>
+    <a href="#languages">어학</a>
 </nav>
 
 <div class="actions">
     <a href="{% url 'resumes:pdf' resume_id=resume_id %}">원본 PDF 보기</a>
     <a href="{% url 'resumes:excel' resume_id=resume_id %}">Excel 다운로드</a>
+    <a href="{% url 'resumes:raw_text' resume_id=resume_id %}">원본 텍스트 보기</a>
     <form method="post" action="{% url 'resumes:reanalyze' resume_id=resume_id %}" class="inline-form">
         {% csrf_token %}
         <button type="submit">재분석</button>
@@ -72,6 +73,43 @@
         <p>신뢰도: {{ career.confidence }} {% if career.review_required %}<span class="error">검토필요</span>{% endif %}</p>
         <p>DART 매칭 상태: {{ career.dart_match_status }}
             <a href="{% url 'dart:career_search' resume_id=resume_id index=forloop.counter0 %}" data-loading>기업 매칭</a></p>
+
+        {% if career.responsibilities or career.sub_projects %}
+        <details class="career-detail" {% if career.review_required or career.sub_projects|any_review_required %}open{% endif %}>
+            <summary>경력기술서 보기</summary>
+
+            {% if career.responsibilities %}
+            <div class="career-responsibilities">
+                <h4>주요업무</h4>
+                <ul>
+                    {% for line in career.responsibilities %}
+                    <li>{{ line }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if career.sub_projects %}
+            <div class="career-sub-projects">
+                <h4>프로젝트 이력</h4>
+                {% for project in career.sub_projects %}
+                <div class="record">
+                    <p><strong>{{ project.project_name }}</strong> ({{ project.start_date|default:"?" }} ~ {{ project.end_date|default:"?" }})
+                        {% if project.review_required %}<span class="error">검토필요</span>{% endif %}</p>
+                    {% if project.achievements %}
+                    <ul>
+                        {% for line in project.achievements %}
+                        <li>{{ line }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </details>
+        {% endif %}
+
         <form method="post" action="{% url 'resumes:career_delete' resume_id=resume_id index=forloop.counter0 %}" class="inline-form">
             {% csrf_token %}
             <button type="submit">삭제</button>
@@ -148,15 +186,6 @@
     <p>{{ language.test_name|default:language.language }} {{ language.score|default:"" }} ({{ language.acquired_date|default:"?" }})</p>
     {% empty %}
     <p>등록된 어학 정보가 없습니다.</p>
-    {% endfor %}
-</section>
-
-<section id="raw-text">
-    <h2>원본 텍스트</h2>
-    {% for block in blocks %}
-    <p><small>p.{{ block.page }} [{{ block.method }}]</small> {{ block.text }}</p>
-    {% empty %}
-    <p>추출된 텍스트가 없습니다.</p>
     {% endfor %}
 </section>
 {% endblock %}

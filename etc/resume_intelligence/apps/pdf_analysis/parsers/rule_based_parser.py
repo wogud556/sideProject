@@ -189,12 +189,87 @@ class RuleBasedResumeParser:
 
         return entries
 
+    def _group_career_entries(self, blocks: list[ExtractedBlock]) -> list[dict]:
+        """경력 전용 그룹핑. 회사 엔트리 안에 프로젝트 서브엔트리를 중첩시킨다."""
+        entries: list[dict] = []
+        i, n = 0, len(blocks)
+        while i < n:
+            header = blocks[i]
+            has_next_date = i + 1 < n and fx.extract_date_range(blocks[i + 1].text) is not None
+            header_is_date = fx.extract_date_range(header.text) is not None
+
+            if has_next_date and not header_is_date:
+                date_block = blocks[i + 1]
+                date_range = fx.extract_date_range(date_block.text)
+                j = i + 2
+                detail_blocks: list[ExtractedBlock] = []
+                sub_projects: list[dict] = []
+
+                while j < n:
+                    next_has_date = j + 1 < n and fx.extract_date_range(blocks[j + 1].text) is not None
+                    this_is_date = fx.extract_date_range(blocks[j].text) is not None
+
+                    if next_has_date and not this_is_date:
+                        is_new_company = not detail_blocks or fx.contains_company_suffix(blocks[j].text)
+                        if is_new_company:
+                            break
+                        sub_header = blocks[j]
+                        sub_date_range = fx.extract_date_range(blocks[j + 1].text)
+                        k = j + 2
+                        sub_detail_blocks: list[ExtractedBlock] = []
+                        while k < n:
+                            k_next_has_date = k + 1 < n and fx.extract_date_range(blocks[k + 1].text) is not None
+                            k_this_is_date = fx.extract_date_range(blocks[k].text) is not None
+                            if k_next_has_date and not k_this_is_date:
+                                break
+                            sub_detail_blocks.append(blocks[k])
+                            k += 1
+                        sub_projects.append(
+                            {"header": sub_header, "date_range": sub_date_range, "detail_blocks": sub_detail_blocks}
+                        )
+                        j = k
+                        continue
+
+                    detail_blocks.append(blocks[j])
+                    j += 1
+
+                entries.append(
+                    {
+                        "header": header,
+                        "date_block": date_block,
+                        "date_range": date_range,
+                        "detail_blocks": detail_blocks,
+                        "sub_projects": sub_projects,
+                    }
+                )
+                i = j
+            else:
+                i += 1
+        return entries
+
     def _parse_careers(self, blocks: list[ExtractedBlock]) -> list[Career]:
         careers: list[Career] = []
-        for sort_order, entry in enumerate(self._group_entries(blocks)):
+        for sort_order, entry in enumerate(self._group_career_entries(blocks)):
             header = entry["header"]
             start_date, end_date, is_current = entry["date_range"]
             responsibilities = [b.text for b in entry["detail_blocks"]]
+
+            sub_projects = []
+            for sp_order, sp in enumerate(entry["sub_projects"]):
+                sp_start, sp_end, sp_current = sp["date_range"] or (None, None, False)
+                sub_projects.append(
+                    Project(
+                        project_name=sp["header"].text,
+                        start_date=sp_start,
+                        end_date=sp_end,
+                        achievements=[b.text for b in sp["detail_blocks"]],
+                        sort_order=sp_order,
+                        confidence=CONFIDENCE_LOW,
+                        source_page=sp["header"].page,
+                        source_text=sp["header"].text,
+                        review_required=True,
+                    )
+                )
 
             confidence = CONFIDENCE_HIGH if fx.contains_company_suffix(header.text) else CONFIDENCE_MEDIUM
 
@@ -206,6 +281,7 @@ class RuleBasedResumeParser:
                     end_date=end_date,
                     is_current=is_current,
                     responsibilities=responsibilities,
+                    sub_projects=sub_projects,
                     sort_order=sort_order,
                     confidence=confidence,
                     source_page=header.page,

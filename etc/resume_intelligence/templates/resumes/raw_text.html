@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}원본 텍스트 - {{ document.original_filename }}{% endblock %}
+{% block content %}
+<h1>{{ document.original_filename }} - 원본 텍스트</h1>
+<p><a href="{% url 'resumes:detail' resume_id=resume_id %}">상세 화면으로 돌아가기</a></p>
+
+<section id="raw-text">
+    {% for block in blocks %}
+    <p><small>p.{{ block.page }} [{{ block.method }}]</small> {{ block.text }}</p>
+    {% empty %}
+    <p>추출된 텍스트가 없습니다.</p>
+    {% endfor %}
+</section>
+{% endblock %}

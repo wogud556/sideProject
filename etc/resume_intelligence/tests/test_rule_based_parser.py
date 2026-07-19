@@ -157,6 +157,9 @@ class CareerPeriodValidationHookupTests(SimpleTestCase):
         self.assertTrue(result.profile.careers[0].review_required)
 
     def test_overlapping_careers_produce_warning(self):
+        """회귀 확인: 회사→회사가 중간에 업무 불릿 없이 바로 이어지는 경우
+        (sub_projects 그룹핑 도입 이전과 동일하게) 여전히 careers 2건 +
+        겹침 경고를 낸다."""
         lines = [
             "경력",
             "A회사",
@@ -169,6 +172,7 @@ class CareerPeriodValidationHookupTests(SimpleTestCase):
 
         result = RuleBasedResumeParser().parse(document)
 
+        self.assertEqual(len(result.profile.careers), 2)
         self.assertTrue(any("겹칩니다" in w for w in result.warnings))
 
     def test_valid_non_overlapping_careers_produce_no_period_warnings(self):
@@ -176,3 +180,145 @@ class CareerPeriodValidationHookupTests(SimpleTestCase):
         self.assertFalse(any("겹칩니다" in w or "늦습니다" in w for w in result.warnings))
         for career in result.profile.careers:
             self.assertFalse(career.review_required)
+
+
+class CareerSubProjectGroupingTests(SimpleTestCase):
+    """경력기술서 본문 안의 프로젝트 서브엔트리(sub_projects) 그룹핑 검증.
+
+    _group_career_entries가 "헤더+다음줄날짜" 패턴을 만났을 때, 이미 쌓인
+    detail_blocks가 있고 헤더에 회사 접미사가 없으면 sub_projects로,
+    그렇지 않으면 새 Career 경계로 판단하는 로직을 검증한다.
+    """
+
+    def test_suffix_less_project_subentry_is_absorbed_into_sub_projects(self):
+        """정상 케이스: 회사 헤더+기간, 업무 불릿 1개 이상 뒤에 접미사 없는
+        프로젝트 헤더+기간+상세줄이 오면 sub_projects로 파싱되고, 회사간
+        기간 겹침 오탐도 발생하지 않는다."""
+        lines = [
+            "경력",
+            "ABC주식회사 백엔드 개발자",
+            "2020.03 ~ 2022.05",
+            "- 결제 시스템 개발",
+            "이력서 매칭 시스템 구축",
+            "2021.01 ~ 2021.06",
+            "- 매칭 알고리즘 개선",
+            "- 성능 최적화",
+        ]
+        blocks = [_block(1, i, text) for i, text in enumerate(lines)]
+        document = ExtractedDocument(file_path="x.pdf", page_count=1, blocks=blocks, ocr_used=False, warnings=[])
+
+        result = RuleBasedResumeParser().parse(document)
+        careers = result.profile.careers
+
+        self.assertEqual(len(careers), 1)
+        career = careers[0]
+        self.assertIn("- 결제 시스템 개발", career.responsibilities)
+
+        self.assertEqual(len(career.sub_projects), 1)
+        sub_project = career.sub_projects[0]
+        self.assertEqual(sub_project.project_name, "이력서 매칭 시스템 구축")
+        self.assertEqual(sub_project.start_date, "2021-01")
+        self.assertEqual(sub_project.end_date, "2021-06")
+        self.assertEqual(sub_project.achievements, ["- 매칭 알고리즘 개선", "- 성능 최적화"])
+        self.assertTrue(sub_project.review_required)
+        self.assertEqual(sub_project.confidence, 0.4)
+
+        self.assertFalse(any("겹칩니다" in w for w in result.warnings))
+
+    def test_second_company_with_suffix_after_sub_project_is_parsed_independently(self):
+        """접미사 있는 두 번째 회사 케이스: 첫 회사 안에 프로젝트 서브엔트리가
+        있더라도, 그 다음에 회사 접미사가 붙은 진짜 두 번째 회사가 오면
+        sub_projects로 흡수되지 않고 독립된 Career로 분리된다."""
+        lines = [
+            "경력",
+            "ABC주식회사 백엔드 개발자",
+            "2020.03 ~ 2022.05",
+            "- 결제 시스템 개발",
+            "이력서 매칭 시스템 구축",
+            "2021.01 ~ 2021.06",
+            "- 매칭 알고리즘 개선",
+            "XYZ주식회사 프론트엔드 개발자",
+            "2022.07 ~ 2023.12",
+            "- UI 개발",
+        ]
+        blocks = [_block(1, i, text) for i, text in enumerate(lines)]
+        document = ExtractedDocument(file_path="x.pdf", page_count=1, blocks=blocks, ocr_used=False, warnings=[])
+
+        result = RuleBasedResumeParser().parse(document)
+        careers = result.profile.careers
+
+        self.assertEqual(len(careers), 2)
+        first, second = careers
+
+        self.assertIn("ABC주식회사", first.company_name_raw)
+        self.assertEqual(len(first.sub_projects), 1)
+        self.assertEqual(first.sub_projects[0].project_name, "이력서 매칭 시스템 구축")
+
+        self.assertIn("XYZ주식회사", second.company_name_raw)
+        self.assertEqual(second.start_date, "2022-07")
+        self.assertEqual(second.end_date, "2023-12")
+        self.assertEqual(second.sub_projects, [])
+        self.assertIn("- UI 개발", second.responsibilities)
+
+    def test_known_limitation_case_a_subheader_immediately_after_date_misclassified_as_new_company(self):
+        """알려진 한계(케이스 A): 회사 날짜 라인 바로 다음 줄이 (일반 업무
+        텍스트 없이) 곧바로 프로젝트 서브헤더+날짜인 경우, detail_blocks가
+        비어있어 새 Career로 오분류된다. 이 테스트는 그 현재 동작을 그대로
+        문서화하는 회귀 테스트이며, 로직 수정을 요구하는 것이 아니다."""
+        lines = [
+            "경력",
+            "ABC주식회사 백엔드 개발자",
+            "2020.03 ~ 2022.05",
+            "이력서 매칭 시스템 구축",
+            "2021.01 ~ 2021.06",
+            "- 매칭 알고리즘 개선",
+        ]
+        blocks = [_block(1, i, text) for i, text in enumerate(lines)]
+        document = ExtractedDocument(file_path="x.pdf", page_count=1, blocks=blocks, ocr_used=False, warnings=[])
+
+        result = RuleBasedResumeParser().parse(document)
+        careers = result.profile.careers
+
+        # 의도치 않게 프로젝트 서브헤더가 새로운 Career로 분리된다.
+        self.assertEqual(len(careers), 2)
+        first, second = careers
+        self.assertIn("ABC주식회사", first.company_name_raw)
+        self.assertEqual(first.sub_projects, [])
+        self.assertEqual(first.responsibilities, [])
+
+        self.assertEqual(second.company_name_raw, "이력서 매칭 시스템 구축")
+        self.assertEqual(second.sub_projects, [])
+        self.assertIn("- 매칭 알고리즘 개선", second.responsibilities)
+
+        # 두 Career의 기간이 겹치므로, 원래 있던 "경력 기간이 겹칩니다" 오탐이
+        # 이 케이스에서는 그대로 재현된다.
+        self.assertTrue(any("겹칩니다" in w for w in result.warnings))
+
+    def test_known_limitation_case_b_suffix_less_second_company_absorbed_as_sub_project(self):
+        """알려진 한계(케이스 B): 회사 접미사가 없는 진짜 두 번째 직장이 첫
+        회사의 일반 업무 텍스트 뒤에 나오면, 새 Career가 아니라 첫 회사의
+        sub_projects로 잘못 흡수된다. 이 테스트는 그 현재 동작을 그대로
+        문서화하는 회귀 테스트이며, 로직 수정을 요구하는 것이 아니다."""
+        lines = [
+            "경력",
+            "ABC주식회사 백엔드 개발자",
+            "2020.03 ~ 2022.05",
+            "- 결제 시스템 개발",
+            "카카오 백엔드 개발자",
+            "2022.06 ~ 2023.12",
+            "- 새로운 업무",
+        ]
+        blocks = [_block(1, i, text) for i, text in enumerate(lines)]
+        document = ExtractedDocument(file_path="x.pdf", page_count=1, blocks=blocks, ocr_used=False, warnings=[])
+
+        result = RuleBasedResumeParser().parse(document)
+        careers = result.profile.careers
+
+        # 진짜 별도 경력("카카오")이 최상위 careers 리스트에서 사라지고
+        # 첫 회사의 sub_projects로 흡수된다.
+        self.assertEqual(len(careers), 1)
+        career = careers[0]
+        self.assertIn("ABC주식회사", career.company_name_raw)
+        self.assertEqual(len(career.sub_projects), 1)
+        self.assertEqual(career.sub_projects[0].project_name, "카카오 백엔드 개발자")
+        self.assertFalse(any(c.company_name_raw == "카카오 백엔드 개발자" for c in careers))

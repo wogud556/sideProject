@@ -4,7 +4,9 @@ from pathlib import Path
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, SimpleTestCase, override_settings
+from django.urls import reverse
 
+from apps.pdf_analysis.schemas.profile import Career, Project, ResumeProfile
 from apps.resumes import repository
 from apps.resumes.services import careers_service, upload_service
 
@@ -174,3 +176,87 @@ class DetailEditViewTests(ResumeEditingTestBase):
         self.assertEqual(response.status_code, 302)
         document = repository.read_document(self.view_resume_id)
         self.assertIn(document["analysis_status"], ("COMPLETED", "COMPLETED_WITH_WARNINGS"))
+
+    def test_detail_view_no_longer_has_raw_text_section_but_links_to_it(self):
+        response = self.client.get(f"/resumes/{self.view_resume_id}/")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'id="raw-text"')
+        self.assertContains(
+            response, reverse("resumes:raw_text", args=[self.view_resume_id])
+        )
+
+
+class RawTextViewTests(ResumeEditingTestBase):
+    def setUp(self):
+        super().setUp()
+        self.client = Client()
+        self.user = signup_and_login(self.client)
+        upload = SimpleUploadedFile("resume2.pdf", build_text_resume_pdf(), content_type="application/pdf")
+        self.view_resume_id = upload_service.upload_resume(self.user["id"], upload)
+
+    def test_raw_text_view_owner_200_renders_blocks(self):
+        response = self.client.get(f"/resumes/{self.view_resume_id}/raw-text/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "홍길동")
+
+    def test_raw_text_view_empty_blocks_shows_no_text_message(self):
+        repository.write_blocks(self.view_resume_id, [])
+        response = self.client.get(f"/resumes/{self.view_resume_id}/raw-text/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "추출된 텍스트가 없습니다")
+
+
+class CareerDetailAccordionRenderTests(ResumeEditingTestBase):
+    """detail.html의 <details class="career-detail"> 아코디언 기본 펼침(open)
+    조건 — career.review_required 또는 sub_projects 중 review_required=True
+    항목이 있으면 open, 둘 다 아니면 open 속성이 없어야 한다."""
+
+    def setUp(self):
+        super().setUp()
+        self.client = Client()
+        self.user = signup_and_login(self.client)
+        upload = SimpleUploadedFile("resume3.pdf", build_text_resume_pdf(), content_type="application/pdf")
+        self.view_resume_id = upload_service.upload_resume(self.user["id"], upload)
+
+    def test_details_open_when_sub_project_review_required(self):
+        profile = ResumeProfile(
+            careers=[
+                Career(
+                    company_name_raw="ABC주식회사",
+                    start_date="2020-01",
+                    responsibilities=["- 결제 시스템 개발"],
+                    sub_projects=[
+                        Project(project_name="이력서 매칭 시스템 구축", review_required=True),
+                    ],
+                    review_required=False,
+                )
+            ]
+        )
+        repository.write_profile(self.view_resume_id, profile.model_dump())
+
+        response = self.client.get(f"/resumes/{self.view_resume_id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<details class="career-detail" open>')
+
+    def test_details_not_open_when_nothing_requires_review(self):
+        profile = ResumeProfile(
+            careers=[
+                Career(
+                    company_name_raw="ABC주식회사",
+                    start_date="2020-01",
+                    responsibilities=["- 결제 시스템 개발"],
+                    sub_projects=[
+                        Project(project_name="이력서 매칭 시스템 구축", review_required=False),
+                    ],
+                    review_required=False,
+                )
+            ]
+        )
+        repository.write_profile(self.view_resume_id, profile.model_dump())
+
+        response = self.client.get(f"/resumes/{self.view_resume_id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, '<details class="career-detail" open>')
+        self.assertContains(response, '<details class="career-detail"')

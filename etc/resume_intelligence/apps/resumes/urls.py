@@ -13,6 +13,7 @@ urlpatterns = [
     path("<uuid:resume_id>/reanalyze/", views.reanalyze_view, name="reanalyze"),
     path("<uuid:resume_id>/pdf/", views.pdf_view, name="pdf"),
     path("<uuid:resume_id>/excel/", views.excel_view, name="excel"),
+    path("<uuid:resume_id>/raw-text/", views.raw_text_view, name="raw_text"),
     path("<uuid:resume_id>/basic/", views.basic_info_edit_view, name="basic_edit"),
     path("<uuid:resume_id>/careers/add/", views.career_add_view, name="career_add"),
     path("<uuid:resume_id>/careers/<int:index>/delete/", views.career_delete_view, name="career_delete"),

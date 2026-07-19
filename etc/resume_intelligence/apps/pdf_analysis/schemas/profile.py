@@ -25,6 +25,22 @@ class BasicInfo(BaseModel):
     summary: ExtractedField[str] = Field(default_factory=ExtractedField)
 
 
+class Project(BaseModel):
+    project_name: str = ""
+    organization: str | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    role: str | None = None
+    description: str | None = None
+    technologies: list[str] = Field(default_factory=list)
+    achievements: list[str] = Field(default_factory=list)
+    sort_order: int = 0
+    confidence: float = 0.0
+    source_page: int | None = None
+    source_text: str | None = None
+    review_required: bool = False
+
+
 class Career(BaseModel):
     company_name_raw: str = ""
     company_name_normalized: str = ""
@@ -36,6 +52,7 @@ class Career(BaseModel):
     is_current: bool = False
     responsibilities: list[str] = Field(default_factory=list)
     achievements: list[str] = Field(default_factory=list)
+    sub_projects: list[Project] = Field(default_factory=list)
     sort_order: int = 0
     confidence: float = 0.0
     source_page: int | None = None
@@ -53,22 +70,6 @@ class Education(BaseModel):
     end_date: str | None = None
     graduation_status: str | None = None
     description: str | None = None
-    sort_order: int = 0
-    confidence: float = 0.0
-    source_page: int | None = None
-    source_text: str | None = None
-    review_required: bool = False
-
-
-class Project(BaseModel):
-    project_name: str = ""
-    organization: str | None = None
-    start_date: str | None = None
-    end_date: str | None = None
-    role: str | None = None
-    description: str | None = None
-    technologies: list[str] = Field(default_factory=list)
-    achievements: list[str] = Field(default_factory=list)
     sort_order: int = 0
     confidence: float = 0.0
     source_page: int | None = None

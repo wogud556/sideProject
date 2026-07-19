@@ -337,6 +337,10 @@ section h2 {
     margin: 4px 0;
 }
 
+.career-detail .record {
+    margin-left: 1rem;
+}
+
 /* ---------- Loading overlay ---------- */
 
 #loading-overlay {

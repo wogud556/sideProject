@@ -45,6 +45,10 @@ class NonOwnerTemplateViewTests(PermissionsTestBase):
         response = self.stranger_client.get(f"/resumes/{self.resume_id}/excel/")
         self.assertEqual(response.status_code, 404)
 
+    def test_raw_text_view_404_for_non_owner(self):
+        response = self.stranger_client.get(f"/resumes/{self.resume_id}/raw-text/")
+        self.assertEqual(response.status_code, 404)
+
     def test_delete_view_404_for_non_owner_and_resume_untouched(self):
         response = self.stranger_client.post(f"/resumes/{self.resume_id}/delete/")
         self.assertEqual(response.status_code, 404)
@@ -101,6 +105,12 @@ class NonExistentAndMalformedIdTests(PermissionsTestBase):
         import uuid
 
         response = self.owner_client.get(f"/resumes/{uuid.uuid4()}/")
+        self.assertEqual(response.status_code, 404)
+
+    def test_raw_text_random_uuid_returns_404(self):
+        import uuid
+
+        response = self.owner_client.get(f"/resumes/{uuid.uuid4()}/raw-text/")
         self.assertEqual(response.status_code, 404)
 
     def test_non_uuid_path_segment_returns_404_via_url_converter(self):

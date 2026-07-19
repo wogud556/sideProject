@@ -75,7 +75,6 @@ def detail_view(request, resume_id):
     document = permissions.get_owned_document_or_404(resume_id, user_id)
     profile_data = repository.read_profile(resume_id) or {}
     profile = ResumeProfile.model_validate(profile_data)
-    blocks = repository.read_blocks(resume_id)
 
     return render(
         request,
@@ -84,7 +83,6 @@ def detail_view(request, resume_id):
             "resume_id": resume_id,
             "document": document,
             "profile": profile,
-            "blocks": blocks,
         },
     )
 
@@ -121,6 +119,17 @@ def pdf_view(request, resume_id):
     if not path.exists():
         raise Http404("원본 PDF를 찾을 수 없습니다.")
     return FileResponse(open(path, "rb"), content_type="application/pdf", filename=document["original_filename"])
+
+
+@login_required
+def raw_text_view(request, resume_id):
+    document = permissions.get_owned_document_or_404(resume_id, request.current_user["id"])
+    blocks = repository.read_blocks(resume_id)
+    return render(
+        request,
+        "resumes/raw_text.html",
+        {"resume_id": resume_id, "document": document, "blocks": blocks},
+    )
 
 
 @login_required
