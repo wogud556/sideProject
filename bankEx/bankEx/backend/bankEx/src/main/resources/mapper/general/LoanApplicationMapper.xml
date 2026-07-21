@@ -4,23 +4,23 @@
 
     <select id="findById" resultType="com.hanati.bank.bankEx.loan.general.domain.LoanApplication">
         SELECT APPLICATION_ID, USER_ID, ACCOUNT_NUMBER, PRODUCT_ID, REQUEST_AMOUNT, LOAN_PERIOD,
-               STATUS, REMAINING_BALANCE, CREATED_AT
+               STATUS, REMAINING_BALANCE, REPAYMENT_TYPE, CREATED_AT
         FROM LOAN_APPLICATION
         WHERE APPLICATION_ID = #{applicationId}
     </select>
 
     <select id="findByUserId" resultType="com.hanati.bank.bankEx.loan.general.domain.LoanApplication">
         SELECT APPLICATION_ID, USER_ID, ACCOUNT_NUMBER, PRODUCT_ID, REQUEST_AMOUNT, LOAN_PERIOD,
-               STATUS, REMAINING_BALANCE, CREATED_AT
+               STATUS, REMAINING_BALANCE, REPAYMENT_TYPE, CREATED_AT
         FROM LOAN_APPLICATION
         WHERE USER_ID = #{userId}
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="applicationId" keyColumn="APPLICATION_ID">
         INSERT INTO LOAN_APPLICATION
-            (USER_ID, ACCOUNT_NUMBER, PRODUCT_ID, REQUEST_AMOUNT, LOAN_PERIOD, STATUS, REMAINING_BALANCE, CREATED_AT)
+            (USER_ID, ACCOUNT_NUMBER, PRODUCT_ID, REQUEST_AMOUNT, LOAN_PERIOD, STATUS, REMAINING_BALANCE, REPAYMENT_TYPE, CREATED_AT)
         VALUES
-            (#{userId}, #{accountNumber}, #{productId}, #{requestAmount}, #{loanPeriod}, #{status}, #{remainingBalance}, #{createdAt})
+            (#{userId}, #{accountNumber}, #{productId}, #{requestAmount}, #{loanPeriod}, #{status}, #{remainingBalance}, #{repaymentType}, #{createdAt})
     </insert>
 
     <update id="update">

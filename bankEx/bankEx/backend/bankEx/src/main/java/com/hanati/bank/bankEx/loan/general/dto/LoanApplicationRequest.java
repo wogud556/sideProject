@@ -13,4 +13,5 @@ public class LoanApplicationRequest {
     private Long productId;
     private Long requestAmount;
     private Integer loanPeriod;
+    private String repaymentType;
 }

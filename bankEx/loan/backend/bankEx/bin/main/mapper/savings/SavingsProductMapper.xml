@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hanati.bank.bankEx.deposit.savings.mapper.SavingsProductMapper">
+
+    <select id="findAllOnSale" resultType="com.hanati.bank.bankEx.deposit.savings.domain.SavingsProduct">
+        SELECT PRODUCT_ID, PRODUCT_NAME, BASE_RATE, MAX_RATE, MIN_AMOUNT, MAX_AMOUNT, PERIOD,
+               AUTO_TRANSFER_YN, STATUS, CREATED_AT
+        FROM SAVINGS_PRODUCT
+        WHERE STATUS = 'ON_SALE'
+    </select>
+
+    <select id="findById" resultType="com.hanati.bank.bankEx.deposit.savings.domain.SavingsProduct">
+        SELECT PRODUCT_ID, PRODUCT_NAME, BASE_RATE, MAX_RATE, MIN_AMOUNT, MAX_AMOUNT, PERIOD,
+               AUTO_TRANSFER_YN, STATUS, CREATED_AT
+        FROM SAVINGS_PRODUCT
+        WHERE PRODUCT_ID = #{productId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO SAVINGS_PRODUCT
+            (PRODUCT_ID, PRODUCT_NAME, BASE_RATE, MAX_RATE, MIN_AMOUNT, MAX_AMOUNT, PERIOD,
+             AUTO_TRANSFER_YN, STATUS, CREATED_AT)
+        VALUES
+            (#{productId}, #{productName}, #{baseRate}, #{maxRate}, #{minAmount}, #{maxAmount}, #{period},
+             #{autoTransferYn}, #{status}, #{createdAt})
+    </insert>
+
+</mapper>

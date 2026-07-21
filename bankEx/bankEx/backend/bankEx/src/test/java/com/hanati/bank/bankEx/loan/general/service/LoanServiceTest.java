@@ -130,7 +130,7 @@ class LoanServiceTest {
     @Test
     void applyLoan_success_savesApplicationWithReviewingStatus() {
         when(loanProductMapper.findById(1L)).thenReturn(Optional.of(product(1L, 10_000_000L)));
-        LoanApplicationRequest request = new LoanApplicationRequest("user1", "111-222-33", 1L, 5_000_000L, 12);
+        LoanApplicationRequest request = new LoanApplicationRequest("user1", "111-222-33", 1L, 5_000_000L, 12, "EQUAL_PRINCIPAL");
 
         LoanApplicationResponse response = loanService.applyLoan(request);
 
@@ -145,7 +145,7 @@ class LoanServiceTest {
     @Test
     void applyLoan_productNotFound_throwsIllegalArgumentException() {
         when(loanProductMapper.findById(99L)).thenReturn(Optional.empty());
-        LoanApplicationRequest request = new LoanApplicationRequest("user1", "111-222-33", 99L, 5_000_000L, 12);
+        LoanApplicationRequest request = new LoanApplicationRequest("user1", "111-222-33", 99L, 5_000_000L, 12, "EQUAL_PRINCIPAL");
 
         assertThrows(IllegalArgumentException.class, () -> loanService.applyLoan(request));
         verify(loanApplicationMapper, never()).insert(any());
@@ -154,7 +154,7 @@ class LoanServiceTest {
     @Test
     void applyLoan_amountExceedsMaxLimit_throwsIllegalArgumentException() {
         when(loanProductMapper.findById(1L)).thenReturn(Optional.of(product(1L, 10_000_000L)));
-        LoanApplicationRequest request = new LoanApplicationRequest("user1", "111-222-33", 1L, 10_000_001L, 12);
+        LoanApplicationRequest request = new LoanApplicationRequest("user1", "111-222-33", 1L, 10_000_001L, 12, "EQUAL_PRINCIPAL");
 
         assertThrows(IllegalArgumentException.class, () -> loanService.applyLoan(request));
         verify(loanApplicationMapper, never()).insert(any());

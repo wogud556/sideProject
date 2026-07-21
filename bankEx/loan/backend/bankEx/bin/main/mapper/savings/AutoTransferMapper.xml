@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hanati.bank.bankEx.deposit.savings.mapper.AutoTransferMapper">
+
+    <select id="findByAccountNo" resultType="com.hanati.bank.bankEx.deposit.savings.domain.AutoTransfer">
+        SELECT AUTO_ID, ACCOUNT_NO, WITHDRAW_ACCOUNT, TRANSFER_DAY, STATUS, CREATED_AT
+        FROM AUTO_TRANSFER
+        WHERE ACCOUNT_NO = #{accountNo}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="autoId" keyColumn="AUTO_ID">
+        INSERT INTO AUTO_TRANSFER
+            (ACCOUNT_NO, WITHDRAW_ACCOUNT, TRANSFER_DAY, STATUS, CREATED_AT)
+        VALUES
+            (#{accountNo}, #{withdrawAccount}, #{transferDay}, #{status}, #{createdAt})
+    </insert>
+
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hanati.bank.bankEx.loan.jeonse.mapper.JeonseRepaymentScheduleMapper">
+
+    <select id="findByApplicationIdOrderByPaymentSeq" resultType="com.hanati.bank.bankEx.loan.jeonse.domain.JeonseRepaymentSchedule">
+        SELECT SCHEDULE_ID, APPLICATION_ID, PAYMENT_SEQ, PAYMENT_DATE, PRINCIPAL_AMOUNT, INTEREST_AMOUNT,
+               TOTAL_AMOUNT, PAID_YN, CREATED_AT
+        FROM LOAN_REPAYMENT_SCHEDULE
+        WHERE APPLICATION_ID = #{applicationId}
+        ORDER BY PAYMENT_SEQ
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="scheduleId" keyColumn="SCHEDULE_ID">
+        INSERT INTO LOAN_REPAYMENT_SCHEDULE
+            (APPLICATION_ID, PAYMENT_SEQ, PAYMENT_DATE, PRINCIPAL_AMOUNT, INTEREST_AMOUNT, TOTAL_AMOUNT, PAID_YN, CREATED_AT)
+        VALUES
+            (#{applicationId}, #{paymentSeq}, #{paymentDate}, #{principalAmount}, #{interestAmount}, #{totalAmount}, #{paidYn}, #{createdAt})
+    </insert>
+
+</mapper>

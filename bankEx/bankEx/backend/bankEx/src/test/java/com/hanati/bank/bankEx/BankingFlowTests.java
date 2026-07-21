@@ -129,7 +129,7 @@ class BankingFlowTests {
         assertTrue(validation.isValid());
 
         LoanApplicationResponse application = loanService.applyLoan(
-                new LoanApplicationRequest(userId, accountNumber, productId, 1_000_000L, 12));
+                new LoanApplicationRequest(userId, accountNumber, productId, 1_000_000L, 12, "EQUAL_PRINCIPAL"));
 
         BusinessException notApproved = assertThrows(BusinessException.class,
                 () -> loanService.disburse(new LoanDisbursementRequest(application.getApplicationId())));

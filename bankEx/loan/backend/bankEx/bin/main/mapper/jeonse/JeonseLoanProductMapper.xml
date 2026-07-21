@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hanati.bank.bankEx.loan.jeonse.mapper.JeonseLoanProductMapper">
+
+    <select id="findAllActive" resultType="com.hanati.bank.bankEx.loan.jeonse.domain.JeonseLoanProduct">
+        SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_TYPE, MAX_LIMIT_AMOUNT, BASE_RATE, MIN_RATE, MAX_RATE, USE_YN, CREATED_AT
+        FROM JEONSE_LOAN_PRODUCT
+        WHERE USE_YN = 'Y'
+    </select>
+
+    <select id="findById" resultType="com.hanati.bank.bankEx.loan.jeonse.domain.JeonseLoanProduct">
+        SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_TYPE, MAX_LIMIT_AMOUNT, BASE_RATE, MIN_RATE, MAX_RATE, USE_YN, CREATED_AT
+        FROM JEONSE_LOAN_PRODUCT
+        WHERE PRODUCT_ID = #{productId}
+    </select>
+
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM JEONSE_LOAN_PRODUCT
+    </select>
+
+    <insert id="insert">
+        INSERT INTO JEONSE_LOAN_PRODUCT
+            (PRODUCT_ID, PRODUCT_NAME, PRODUCT_TYPE, MAX_LIMIT_AMOUNT, BASE_RATE, MIN_RATE, MAX_RATE, USE_YN, CREATED_AT)
+        VALUES
+            (#{productId}, #{productName}, #{productType}, #{maxLimitAmount}, #{baseRate}, #{minRate}, #{maxRate}, #{useYn}, #{createdAt})
+    </insert>
+
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hanati.bank.bankEx.loan.jeonse.mapper.JeonseContractMapper">
+
+    <select id="findByApplicationId" resultType="com.hanati.bank.bankEx.loan.jeonse.domain.JeonseContract">
+        SELECT CONTRACT_ID, APPLICATION_ID, LESSOR_NAME, LESSOR_PHONE, HOUSE_ADDRESS, HOUSE_TYPE,
+               CAPITAL_AREA_YN, DEPOSIT_AMOUNT, DOWN_PAYMENT_AMOUNT, CONTRACT_START_DATE, CONTRACT_END_DATE,
+               FIXED_DATE_YN, MOVE_IN_PLAN_YN, SENIOR_CLAIM_AMOUNT, CREATED_AT
+        FROM JEONSE_CONTRACT
+        WHERE APPLICATION_ID = #{applicationId}
+    </select>
+
+    <select id="countById" resultType="int">
+        SELECT COUNT(*) FROM JEONSE_CONTRACT WHERE CONTRACT_ID = #{contractId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO JEONSE_CONTRACT
+            (CONTRACT_ID, APPLICATION_ID, LESSOR_NAME, LESSOR_PHONE, HOUSE_ADDRESS, HOUSE_TYPE,
+             CAPITAL_AREA_YN, DEPOSIT_AMOUNT, DOWN_PAYMENT_AMOUNT, CONTRACT_START_DATE, CONTRACT_END_DATE,
+             FIXED_DATE_YN, MOVE_IN_PLAN_YN, SENIOR_CLAIM_AMOUNT, CREATED_AT)
+        VALUES
+            (#{contractId}, #{applicationId}, #{lessorName}, #{lessorPhone}, #{houseAddress}, #{houseType},
+             #{capitalAreaYn}, #{depositAmount}, #{downPaymentAmount}, #{contractStartDate}, #{contractEndDate},
+             #{fixedDateYn}, #{moveInPlanYn}, #{seniorClaimAmount}, #{createdAt})
+    </insert>
+
+</mapper>

@@ -141,7 +141,7 @@ class AccountCloseFlowTests {
         String accountNumber = signup(userId).getAccountNumber();
         Long productId = loanService.getProducts().get(0).getProductId();
 
-        loanService.applyLoan(new LoanApplicationRequest(userId, accountNumber, productId, 1_000_000L, 12));
+        loanService.applyLoan(new LoanApplicationRequest(userId, accountNumber, productId, 1_000_000L, 12, "EQUAL_PRINCIPAL"));
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> accountService.closeAccount(accountNumber, new AccountCloseRequest(userId)));
@@ -155,7 +155,7 @@ class AccountCloseFlowTests {
         Long productId = loanService.getProducts().get(0).getProductId();
 
         LoanApplicationResponse application = loanService.applyLoan(
-                new LoanApplicationRequest(userId, accountNumber, productId, 1_000_000L, 12));
+                new LoanApplicationRequest(userId, accountNumber, productId, 1_000_000L, 12, "EQUAL_PRINCIPAL"));
         loanService.approveApplication(application.getApplicationId());
         loanService.disburse(new LoanDisbursementRequest(application.getApplicationId()));
         loanService.repay(new LoanRepaymentRequest(application.getApplicationId(), 1_000_000L));

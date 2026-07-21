@@ -26,5 +26,8 @@ public class LoanApplication {
     @Setter
     private Long remainingBalance;
 
+    @Setter
+    private String repaymentType;
+
     private LocalDateTime createdAt;
 }

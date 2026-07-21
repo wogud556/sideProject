@@ -76,6 +76,7 @@ public class loanService {
                 .productId(request.getProductId())
                 .requestAmount(request.getRequestAmount())
                 .loanPeriod(request.getLoanPeriod())
+                .repaymentType(request.getRepaymentType())
                 .status("심사중")
                 .createdAt(LocalDateTime.now())
                 .build();
