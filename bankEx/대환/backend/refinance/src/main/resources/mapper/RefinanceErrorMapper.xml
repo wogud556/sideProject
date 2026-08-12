@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hanati.bank.refinance.refinance.mapper.RefinanceErrorMapper">
+
+    <select id="search" resultType="com.hanati.bank.refinance.refinance.dto.ErrorSearchResult">
+        SELECT
+            e.ERROR_ID       AS errorId,
+            e.APPLICATION_ID AS applicationId,
+            a.APPLICATION_NO AS applicationNo,
+            a.CUSTOMER_ID    AS customerId,
+            e.FAILED_STEP    AS failedStep,
+            e.ERROR_CODE     AS errorCode,
+            e.ERROR_MESSAGE  AS errorMessage,
+            e.STATUS         AS status,
+            e.RETRY_COUNT    AS retryCount,
+            e.CREATED_AT     AS createdAt
+        FROM TB_REFINANCE_ERROR e
+        JOIN TB_REFINANCE_APPLICATION a ON a.APPLICATION_ID = e.APPLICATION_ID
+        <where>
+            <if test="transactionDate != null">
+                AND CAST(e.CREATED_AT AS DATE) = #{transactionDate}
+            </if>
+            <if test="applicationNo != null and applicationNo != ''">
+                AND a.APPLICATION_NO = #{applicationNo}
+            </if>
+            <if test="customerId != null">
+                AND a.CUSTOMER_ID = #{customerId}
+            </if>
+            <if test="failedStep != null and failedStep != ''">
+                AND e.FAILED_STEP = #{failedStep}
+            </if>
+            <if test="errorCode != null and errorCode != ''">
+                AND e.ERROR_CODE = #{errorCode}
+            </if>
+            <if test="status != null and status != ''">
+                AND e.STATUS = #{status}
+            </if>
+        </where>
+        ORDER BY e.CREATED_AT DESC
+    </select>
+
+</mapper>
