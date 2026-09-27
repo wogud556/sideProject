@@ -1,0 +1,552 @@
+<title>3700만원 커트라인</title>
+<style>
+:root{
+  --ground:#EEF1F4;
+  --panel:#FFFFFF;
+  --panel-2:#F5F7F9;
+  --ink:#141A21;
+  --ink-2:#3D4956;
+  --steel:#6C7A88;
+  --hair:#D8DEE5;
+  --hair-strong:#BFC8D2;
+  --accent:#0E5F66;
+  --accent-soft:#DCEAEB;
+  --pass:#1C6E48;
+  --pass-soft:#DCEBE2;
+  --over:#A6362D;
+  --over-soft:#F4E0DD;
+  --shadow:0 1px 0 rgba(20,26,33,.04), 0 6px 22px -14px rgba(20,26,33,.30);
+  --sans:'Pretendard','Pretendard Variable',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;
+  --mono:ui-monospace,'SF Mono','JetBrains Mono','Cascadia Mono',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#10151A;
+    --panel:#181F26;
+    --panel-2:#1E262E;
+    --ink:#E6EBF0;
+    --ink-2:#B7C2CD;
+    --steel:#8B99A7;
+    --hair:#2B353F;
+    --hair-strong:#3B4854;
+    --accent:#5CC2C9;
+    --accent-soft:#123336;
+    --pass:#54BE8B;
+    --pass-soft:#12301F;
+    --over:#E08079;
+    --over-soft:#33191A;
+    --shadow:0 1px 0 rgba(0,0,0,.30), 0 8px 26px -16px rgba(0,0,0,.75);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#10151A;
+  --panel:#181F26;
+  --panel-2:#1E262E;
+  --ink:#E6EBF0;
+  --ink-2:#B7C2CD;
+  --steel:#8B99A7;
+  --hair:#2B353F;
+  --hair-strong:#3B4854;
+  --accent:#5CC2C9;
+  --accent-soft:#123336;
+  --pass:#54BE8B;
+  --pass-soft:#12301F;
+  --over:#E08079;
+  --over-soft:#33191A;
+  --shadow:0 1px 0 rgba(0,0,0,.30), 0 8px 26px -16px rgba(0,0,0,.75);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 96px}
+
+/* ---------- masthead ---------- */
+.masthead{
+  border-bottom:1px solid var(--hair);
+  padding:64px 0 40px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:32px;
+  align-items:end;
+}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin:0 0 14px;
+}
+h1{
+  font-size:clamp(34px,5.4vw,54px);
+  line-height:1.08;
+  letter-spacing:-.025em;
+  font-weight:800;
+  margin:0 0 16px;
+  text-wrap:balance;
+}
+.dek{margin:0;color:var(--ink-2);font-size:17px;max-width:56ch}
+.ceiling-chip{
+  border:1px solid var(--hair-strong);
+  background:var(--panel);
+  border-radius:2px;
+  padding:16px 20px;
+  min-width:210px;
+  box-shadow:var(--shadow);
+}
+.ceiling-chip .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel)}
+.ceiling-chip .v{font-family:var(--mono);font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.25;font-variant-numeric:tabular-nums}
+.ceiling-chip .n{font-size:12.5px;color:var(--steel);margin-top:4px}
+
+/* ---------- sections ---------- */
+section{padding:56px 0 0}
+.sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.sec-label{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--panel);background:var(--accent);padding:3px 8px;border-radius:2px;
+}
+h2{font-size:clamp(22px,2.8vw,29px);line-height:1.25;letter-spacing:-.02em;font-weight:750;margin:0;text-wrap:balance}
+.sec-sub{color:var(--ink-2);margin:10px 0 26px;max-width:70ch;font-size:15.5px}
+
+.panel{background:var(--panel);border:1px solid var(--hair);border-radius:3px;box-shadow:var(--shadow)}
+.pad{padding:22px 24px}
+
+/* ---------- formula ---------- */
+.formula-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:20px}
+.formula{font-family:var(--mono);font-size:14px;line-height:2.05;color:var(--ink);font-variant-numeric:tabular-nums}
+.formula .op{color:var(--steel)}
+.formula .hl{color:var(--accent);font-weight:700}
+.cap-card{background:var(--accent-soft);border:1px solid var(--accent);border-radius:3px;padding:22px 24px;display:flex;flex-direction:column;justify-content:center}
+.cap-card .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.cap-card .v{font-family:var(--mono);font-size:38px;font-weight:750;letter-spacing:-.03em;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+.cap-card .n{font-size:13px;color:var(--ink-2);margin-top:10px;line-height:1.5}
+
+/* ---------- tables ---------- */
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--hair)}
+thead th{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--steel);font-weight:600;border-bottom:1px solid var(--hair-strong);white-space:nowrap;
+}
+td.num,th.num{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--panel-2)}
+.tag{font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:2px;letter-spacing:.05em;white-space:nowrap}
+.tag.pass{background:var(--pass-soft);color:var(--pass)}
+.tag.over{background:var(--over-soft);color:var(--over)}
+
+/* ---------- budget chart ---------- */
+.chart{padding:24px 24px 18px}
+.chart-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--steel);margin-bottom:20px;align-items:center}
+.swatch{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.grp{margin-bottom:26px}
+.grp:last-child{margin-bottom:6px}
+.grp-name{font-size:12.5px;font-weight:700;color:var(--steel);letter-spacing:.02em;margin-bottom:9px;padding-bottom:5px;border-bottom:1px solid var(--hair)}
+.bar-row{display:grid;grid-template-columns:172px 1fr 92px;gap:12px;align-items:center;padding:3px 0}
+.bar-label{font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{position:relative;height:17px;background:var(--panel-2);border-radius:2px;overflow:hidden}
+.fill{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--pass);opacity:.82}
+.fill.over{background:var(--over)}
+.bar-val{font-family:var(--mono);font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.chart-body{position:relative}
+.chart-body::after{
+  content:"";position:absolute;top:0;bottom:0;width:2px;background:var(--accent);opacity:.55;pointer-events:none;
+}
+
+/* ---------- model cards ---------- */
+.models{display:grid;gap:20px}
+.model{background:var(--panel);border:1px solid var(--hair);border-radius:3px;box-shadow:var(--shadow);overflow:hidden}
+.model-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:18px 24px;border-bottom:1px solid var(--hair);background:var(--panel-2)}
+.model-name{font-size:20px;font-weight:750;letter-spacing:-.015em}
+.model-class{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);border:1px solid var(--hair-strong);padding:2px 7px;border-radius:2px}
+.model-note{font-size:13.5px;color:var(--steel);margin-left:auto}
+.model-body{display:grid;grid-template-columns:1.15fr 1fr;gap:0}
+.model-col{padding:20px 24px}
+.model-col + .model-col{border-left:1px solid var(--hair)}
+.subhead{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--steel);margin:0 0 12px}
+.opts{list-style:none;margin:0;padding:0;font-size:13.5px}
+.opts li{display:flex;justify-content:space-between;gap:14px;padding:5px 0;border-bottom:1px dotted var(--hair)}
+.opts li:last-child{border-bottom:none}
+.opts .p{font-family:var(--mono);color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.build{border:1px solid var(--hair);border-left:3px solid var(--accent);border-radius:2px;padding:12px 14px;margin-top:12px;background:var(--panel-2)}
+.build:first-of-type{margin-top:0}
+.build .bt{font-size:13.5px;font-weight:700;margin-bottom:5px}
+.build .bd{font-size:13px;color:var(--ink-2);line-height:1.55}
+.build .bp{font-family:var(--mono);font-size:14px;font-weight:700;margin-top:7px;font-variant-numeric:tabular-nums}
+.build.tight{border-left-color:var(--over)}
+
+/* ---------- picks ---------- */
+.picks{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.pick{background:var(--panel);border:1px solid var(--hair);border-top:3px solid var(--accent);border-radius:3px;padding:22px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.pick .role{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.pick .car{font-size:18px;font-weight:750;line-height:1.3;letter-spacing:-.015em;margin-bottom:6px}
+.pick .spec{font-size:12.5px;color:var(--steel);font-family:var(--mono);margin-bottom:14px}
+.pick ul{list-style:none;margin:0 0 16px;padding:0;font-size:13px;color:var(--ink-2)}
+.pick ul li{padding:3px 0}
+.pick .price{margin-top:auto;padding-top:14px;border-top:1px solid var(--hair)}
+.pick .price .lab{font-size:11.5px;color:var(--steel);font-family:var(--mono)}
+.pick .price .v{font-family:var(--mono);font-size:22px;font-weight:750;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.pick .why{font-size:13px;color:var(--ink-2);margin-top:12px;line-height:1.55}
+
+/* ---------- takeaways ---------- */
+.takes{display:grid;gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:3px;overflow:hidden}
+.take{background:var(--panel);padding:20px 24px}
+.take h3{font-size:16px;font-weight:750;margin:0 0 7px;letter-spacing:-.01em}
+.take p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.6}
+
+.callout{border:1px solid var(--hair-strong);border-left:3px solid var(--accent);background:var(--panel);border-radius:2px;padding:16px 20px;font-size:14px;color:var(--ink-2);line-height:1.65;margin-top:20px}
+.callout strong{color:var(--ink)}
+.fn{font-size:12.5px;color:var(--steel);line-height:1.6;margin-top:14px}
+.fn a{color:var(--accent)}
+a{color:var(--accent)}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+
+footer{border-top:1px solid var(--hair);margin-top:64px;padding-top:26px;font-size:13px;color:var(--steel);line-height:1.7}
+footer .srcs{display:flex;gap:8px 20px;flex-wrap:wrap;margin-top:10px}
+
+@media (max-width:880px){
+  .formula-grid,.model-body{grid-template-columns:1fr}
+  .model-col + .model-col{border-left:none;border-top:1px solid var(--hair)}
+  .picks{grid-template-columns:1fr}
+  .masthead{grid-template-columns:1fr;align-items:start}
+  .bar-row{grid-template-columns:132px 1fr 84px;gap:9px}
+  .bar-label{font-size:12px}
+  .ceiling-inner{left:141px;right:93px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div>
+    <p class="eyebrow">2026년 8월 기준 · 국산 SUV 5종</p>
+    <h1>3,700만원에서 잘리는 트림, 살아남는 트림</h1>
+    <p class="dek">취등록세를 포함한 총 지출 3,700만원. 이 선을 기준으로 셀토스·코나·트레일블레이저·투싼·스포티지의 어느 트림까지, 어떤 옵션까지 손에 넣을 수 있는지 정리했다.</p>
+  </div>
+  <div class="ceiling-chip">
+    <div class="k">차량 판매가 상한</div>
+    <div class="v" id="capValue">—</div>
+    <div class="n">이 금액을 넘으면 예산 초과</div>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="sec-label">기준</span><h2>예산 3,700만원을 차량가로 환산하면</h2></div>
+  <p class="sec-sub">계약서에 찍히는 차량 판매가와 실제로 통장에서 나가는 돈은 다르다. 먼저 두 금액을 잇는 식을 고정한다.</p>
+  <div class="formula-grid">
+    <div class="panel pad">
+      <div class="formula">
+        <span class="hl">실구매가</span> <span class="op">=</span> 차량 판매가<br>
+        <span class="op">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+</span> 취득세 <span class="op">(</span> 판매가 ÷ 1.1 × 7% <span class="op">)</span><br>
+        <span class="op">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+</span> 기타 등록비용 30만원
+      </div>
+      <p class="fn">취득세 과세표준은 부가세를 뺀 공급가액이라 판매가를 1.1로 나눈다. 기타 등록비용은 공채 할인매입·증지·번호판을 합친 값으로, 지역별 공채 매입률에 따라 달라진다. 탁송료와 보험료는 별도.</p>
+    </div>
+    <div class="cap-card">
+      <div class="k">차량 판매가 상한</div>
+      <div class="v" id="capValue2">—</div>
+      <div class="n">여기까지가 실구매가 3,700만원 안에 들어오는 계약서 금액이다.</div>
+    </div>
+  </div>
+  <div class="callout">
+    <strong>하이브리드 세제혜택은 반쪽만 남았다.</strong> 취득세 감면(최대 40만원)은 2024년 12월 31일자로 일몰 종료돼 지금은 적용되지 않는다. 개별소비세·교육세 감면(약 100만원)은 2026년 12월 31일까지 유효하며, 이 문서의 하이브리드 가격은 모두 이 혜택이 반영된 <em>세제혜택 후</em> 금액이다.
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-label">후보</span><h2>비교 대상 5종</h2></div>
+  <p class="sec-sub">차급이 두 갈래로 갈린다. 같은 예산에서 소형은 최상위 트림을, 준중형은 중간 트림을 사게 된다.</p>
+  <div class="panel"><div class="tscroll"><table>
+    <thead><tr><th>차종</th><th>차급</th><th>파워트레인</th><th class="num">시작가</th><th class="num">복합연비</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td>현대 코나</td><td>소형</td><td>가솔린 2.0 / 1.6T / 1.6 HEV</td><td class="num">2,393만</td><td class="num">13.6 / 13.0 / 19.8</td><td>2027년형 · 26.4 출시</td></tr>
+      <tr><td>기아 셀토스</td><td>소형</td><td>가솔린 1.6T / 1.6 HEV</td><td class="num">2,512만</td><td class="num">12.5 / 19.5</td><td>하이브리드 최초 적용</td></tr>
+      <tr><td>쉐보레 트레일블레이저</td><td>소형</td><td>가솔린 1.35T</td><td class="num">2,796만</td><td class="num">12.9</td><td>하이브리드 없음</td></tr>
+      <tr><td>현대 투싼</td><td>준중형</td><td>가솔린 1.6T / 1.6T HEV</td><td class="num">2,844만</td><td class="num">12.5 / 16.2</td><td>2026년형 · 25.8 출시</td></tr>
+      <tr><td>기아 스포티지</td><td>준중형</td><td>가솔린 1.6T / LPG / 1.6T HEV</td><td class="num">2,944만</td><td class="num">12.3 / 16.3</td><td>2027년형 · 가격 인상</td></tr>
+    </tbody>
+  </table></div></div>
+  <p class="fn">시작가는 2WD·세제혜택 후 기준. 복합연비는 각 파워트레인의 최저 인치 휠 기준(km/ℓ).</p>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-label">예산선</span><h2>전 트림을 한 줄에 세우면</h2></div>
+  <p class="sec-sub">옵션을 하나도 넣지 않은 기본 트림의 실구매가다. 세로선이 3,700만원. 선을 넘은 트림은 여기서 이미 탈락한다.</p>
+  <div class="panel chart">
+    <div class="chart-legend">
+      <span><span class="swatch" style="background:var(--pass)"></span>예산 내</span>
+      <span><span class="swatch" style="background:var(--over)"></span>예산 초과</span>
+      <span><span class="swatch" style="background:var(--accent);width:3px"></span>실구매가 3,700만원</span>
+    </div>
+    <div id="chart"></div>
+  </div>
+  <div class="callout">
+    투싼 가솔린 인스퍼레이션은 실구매 <strong>3,705만원</strong>. 단 5만원 차이로 잘린다. 할인 조건에 따라 넘어올 수 있는 구간이니 견적은 받아볼 만하다.
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-label">차종별</span><h2>트림과 옵션, 그리고 넣을 수 있는 조합</h2></div>
+  <p class="sec-sub">기본 트림이 예산에 들어와도 옵션까지 채우면 얘기가 달라진다. 차종마다 남는 예산으로 실제 무엇을 살 수 있는지 조합으로 확인한다.</p>
+  <div class="models" id="models"></div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-label">추천</span><h2>무엇을 우선하느냐에 따라 답이 갈린다</h2></div>
+  <p class="sec-sub">세 조합 모두 실구매가 3,700만원 이내. 남는 금액은 탁송료·틴팅·블랙박스·초년도 보험료로 들어간다.</p>
+  <div class="picks" id="picks"></div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-label">유지비</span><h2>연료비로 따라잡는 데 걸리는 시간</h2></div>
+  <p class="sec-sub">연 15,000km, 휘발유 1,860원/ℓ(2026년 8월 전국 평균) 기준으로 공인 복합연비를 단순 환산했다.</p>
+  <div class="panel"><div class="tscroll"><table id="fuelTable">
+    <thead><tr><th>구성</th><th class="num">복합연비</th><th class="num">연간 연료비</th><th class="num">5년 누적</th><th class="num">최저 대비 차이</th></tr></thead>
+    <tbody></tbody>
+  </table></div></div>
+  <div class="callout">
+    하이브리드와 가솔린의 차값 차이는 약 300~400만원인데, 위 표 기준 5년 연료비 절감은 100만원 남짓이다. 취득세 감면이 사라진 지금은 <strong>8~10년</strong>을 타야 손익분기에 닿는다. 다만 도심 정체 주행 비중이 높으면 실주행 격차가 공인연비보다 훨씬 벌어져 회수 기간이 크게 짧아진다.
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="sec-label">정리</span><h2>결국 남는 네 문장</h2></div>
+  <div class="takes">
+    <div class="take">
+      <h3>하이브리드를 원하면 소형이 유리하다</h3>
+      <p>옵션까지 갖춘 하이브리드는 코나와 셀토스뿐이다. 준중형 하이브리드는 투싼 모던과 스포티지 프레스티지 두 최하위 트림만 선을 넘고, 스포티지는 옵션 여유가 15만원밖에 없어 사실상 깡통으로 사야 한다.</p>
+    </div>
+    <div class="take">
+      <h3>준중형이 필요하면 가솔린 중간 트림</h3>
+      <p>투싼 H-Pick(3,201만)과 스포티지 프레스티지+옵션(3,281만)이 예산 내 최선이다. 둘 다 고속도로 주행보조가 기본이라 안전 옵션을 따로 살 필요가 없다.</p>
+    </div>
+    <div class="take">
+      <h3>트레일블레이저는 예산이 남는 쪽</h3>
+      <p>RS 최상위에 선루프까지 얹어도 실구매 3,642만원이고, Premier로 내리면 3,200만원대라 500만원 가까이 남는다. 대신 하이브리드가 없고 1.35L 3기통이라 정숙성과 재판매가에서 불리하다.</p>
+    </div>
+    <div class="take">
+      <h3>체감 사양은 소형이 앞선다</h3>
+      <p>같은 예산에서 셀토스·코나는 최상위 트림에 파노라마 선루프와 차로변경 보조까지 넣을 수 있다. 차급을 살 것인가 옵션을 살 것인가 — 이 예산대의 실제 선택지는 그 한 가지다.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>모든 가격은 2026년 8월 기준 제조사 공시가이며 프로모션·개별 할인은 반영하지 않았다. 최종 금액은 반드시 영업점 견적서로 확인할 것.</div>
+  <div class="srcs">
+    <a href="https://www.hyundai.com/contents/repn-car/catalog/tucson-2026-price.pdf">현대 2026 투싼 가격표</a>
+    <a href="https://www.hyundai.com/contents/repn-car/catalog/tucson-hybrid-2026-price.pdf">투싼 하이브리드</a>
+    <a href="https://www.hyundai.com/contents/repn-car/catalog/kona-2027-price.pdf">2027 코나</a>
+    <a href="https://www.hyundai.com/contents/repn-car/catalog/kona-hybrid-2027-price.pdf">코나 하이브리드</a>
+    <a href="https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/price/price_seltos.pdf">기아 셀토스 가격표</a>
+    <a href="https://www.kia.com/content/dam/kwp/kr/ko/vehicles/pdf/price/price_sportage.pdf">기아 스포티지 가격표</a>
+    <a href="https://www.chevrolet.co.kr/suvs/trailblazer">쉐보레 트레일블레이저</a>
+  </div>
+</footer>
+
+</div>
+
+<script>
+const BUDGET = 3700, ETC = 30, RATE = 0.07 / 1.1;
+const tax   = p => p * RATE;
+const real  = p => p + tax(p) + ETC;
+const CAP   = (BUDGET - ETC) / (1 + RATE);
+const won   = n => Math.round(n).toLocaleString('ko-KR') + '만';
+
+document.getElementById('capValue').textContent  = won(CAP);
+document.getElementById('capValue2').textContent = won(CAP);
+
+/* ---------- 예산선 차트 ---------- */
+const CHART = [
+  ['코나 가솔린', [['모던',2463],['H-Pick',2685],['프리미엄',2915],['인스퍼레이션',3146],['N Line',3245]]],
+  ['코나 하이브리드', [['모던',2938],['H-Pick',3120],['프리미엄',3367],['인스퍼레이션',3563],['N Line',3667]]],
+  ['셀토스 가솔린', [['트렌디',2512],['프레스티지',2880],['시그니처',3145],['X-Line',3263]]],
+  ['셀토스 하이브리드', [['트렌디',2940],['프레스티지',3255],['시그니처',3520],['X-Line',3636]]],
+  ['트레일블레이저 가솔린', [['Premier',2796],['RS',3096]]],
+  ['투싼 가솔린', [['모던',2844],['프리미엄',3112],['H-Pick',3201],['인스퍼레이션',3456]]],
+  ['투싼 하이브리드', [['모던',3318],['프리미엄',3565],['H-Pick',3649]]],
+  ['스포티지 가솔린', [['프레스티지',2944],['노블레스',3322],['시그니처',3557],['X-Line',3622]]],
+  ['스포티지 하이브리드', [['프레스티지',3436],['노블레스',3803],['시그니처',4038]]]
+];
+const LO = 2500, HI = 4450;
+const pct = v => ((v - LO) / (HI - LO)) * 100;
+
+const chart = document.getElementById('chart');
+let html = '<div class="chart-body">';
+for (const [group, trims] of CHART) {
+  html += '<div class="grp"><div class="grp-name">' + group + '</div>';
+  for (const [name, price] of trims) {
+    const r = real(price), over = r > BUDGET;
+    html += '<div class="bar-row">'
+      + '<div class="bar-label">' + name + '</div>'
+      + '<div class="track"><div class="fill' + (over ? ' over' : '') + '" style="width:' + pct(r).toFixed(2) + '%"></div></div>'
+      + '<div class="bar-val">' + won(r) + '</div>'
+      + '</div>';
+  }
+  html += '</div>';
+}
+html += '</div>';
+chart.innerHTML = html;
+/* 예산선 세로 마커 위치 — 라벨/값 열 폭을 뺀 트랙 영역 기준 */
+const style = document.createElement('style');
+style.textContent = '.chart-body::after{left:calc(184px + (100% - 276px) * ' + (pct(BUDGET) / 100).toFixed(4) + ')}'
+  + '@media (max-width:880px){.chart-body::after{left:calc(141px + (100% - 234px) * ' + (pct(BUDGET) / 100).toFixed(4) + ')}}';
+document.head.appendChild(style);
+
+/* ---------- 차종별 ---------- */
+const MODELS = [
+  {
+    name:'현대 코나', cls:'소형 SUV', note:'2027년형 · 26.4 출시 · 5종 중 시작가 최저',
+    trims:[['가솔린 모던',2463],['가솔린 H-Pick',2685],['가솔린 프리미엄',2915],['가솔린 인스퍼레이션',3146],
+           ['가솔린 N Line',3245],['HEV 모던',2938],['HEV H-Pick',3120],['HEV 프리미엄',3367],['HEV 인스퍼레이션',3563]],
+    opts:[['현대 스마트센스 Ⅰ · HDA 포함','110만'],['베스트 셀렉션 · 스마트센스Ⅲ + 12.3 클러스터','79만'],
+          ['파킹어시스트 · 서라운드뷰 + 원격주차','99만'],['시트플러스 · 릴랙션 컴포트 + 2열 열선','49만'],
+          ['와이드 선루프','59만'],['BOSE 프리미엄 사운드','59만'],['컨비니언스 · 파워테일게이트 + 무선충전','40만'],
+          ['빌트인 캠2 + AR 내비','45만'],['HTRAC 4WD','203만']],
+    builds:[
+      {t:'연비 우선 — HEV H-Pick', d:'베스트 셀렉션 79 + 파킹어시스트 99 + 빌트인캠2 45 + 컨비니언스 40', p:3383},
+      {t:'대안 — HEV 프리미엄 단독', d:'LED 헤드램프·파워테일게이트·디지털키2 기본. 옵션 여유 적음', p:3367},
+      {t:'사양 우선 — 가솔린 인스퍼레이션', d:'파킹어시스트 99 + 와이드선루프 59 + BOSE 59 + 빌트인캠2 45', p:3408}
+    ],
+    fn:'가솔린 1.6T 13.0km/ℓ(17인치), 하이브리드 19.8km/ℓ(17인치) — 5종 중 연비 1위.'
+  },
+  {
+    name:'기아 셀토스', cls:'소형 SUV', note:'신형 · 소형 중 유일하게 신규 하이브리드 보유',
+    trims:[['가솔린 트렌디',2512],['가솔린 프레스티지',2880],['가솔린 시그니처',3145],['가솔린 X-Line',3263],
+           ['HEV 트렌디',2940],['HEV 프레스티지',3255],['HEV 시그니처',3520]],
+    opts:[['12.3인치 내비게이션 · 트렌디','109만'],['컨비니언스 · 인조가죽 + 통풍시트','64만'],
+          ['드라이브 와이즈 · HDA2 차로변경 보조','79~119만'],['파노라마 선루프','109만'],
+          ['하만카돈 프리미엄 사운드','89만'],['12.3인치 클러스터','40만'],['빌트인 캠2 플러스','45만'],
+          ['스타일 · LED 헤드램프 + 18~19인치 휠','89~109만'],['전자식 4WD','198만']],
+    builds:[
+      {t:'옵션 우선 — 가솔린 시그니처', d:'드라이브 와이즈 79 + 파노라마 선루프 109 + 빌트인캠2 45', p:3378},
+      {t:'연비 우선 — HEV 프레스티지', d:'12.3인치 클러스터 40 + 빌트인캠2 45', p:3340}
+    ],
+    fn:'가솔린 12.0km/ℓ(18인치), 하이브리드 19.5km/ℓ(16인치). 옵션 가격은 기아 공식 가격표와 플릿랩 자료를 교차 확인한 값.'
+  },
+  {
+    name:'쉐보레 트레일블레이저', cls:'소형 SUV', note:'하이브리드 없음 · 1.35L 3기통 터보 156마력',
+    trims:[['Premier FWD',2796],['RS FWD',3096]],
+    opts:[['드라이브 어시스트 패키지 · ACC 등','80만'],['컴포트 패키지 · Premier','110만'],
+          ['프리미엄 패키지 · RS','100만'],['파노라마 선루프 · RS','120만'],
+          ['스위처블 AWD 패키지 · RS','240만'],['미드나잇 에디션 · 외장 블랙','150만']],
+    builds:[
+      {t:'풀옵션 — RS', d:'드라이브 어시스트 80 + 프리미엄 100 + 파노라마 선루프 120', p:3396},
+      {t:'사륜이 필요하면 — RS', d:'스위처블 AWD 240 + 드라이브 어시스트 80', p:3416},
+      {t:'절약 — Premier', d:'컴포트 110 + 드라이브 어시스트 80', p:2986}
+    ],
+    fn:'복합연비 FWD 12.9km/ℓ(17인치) · AWD 11.6km/ℓ. ACTIV는 한정판이라 재고에 따라 선택이 막힐 수 있다. 가격은 개별소비세 5% 기준 공시가.'
+  },
+  {
+    name:'현대 투싼', cls:'준중형 SUV', note:'2026년형 · 25.8 출시 · 차급 한 단계 위',
+    trims:[['가솔린 모던',2844],['가솔린 프리미엄',3112],['가솔린 H-Pick',3201],['가솔린 인스퍼레이션',3456],
+           ['HEV 모던',3318],['HEV 프리미엄',3565],['HEV H-Pick',3649]],
+    opts:[['인포테인먼트 내비 · 12.3인치','89만 / HEV 59만'],['현대 스마트센스 · HDA + SCC','40만'],
+          ['컴포트 Ⅰ · 통풍 + 전동시트 + 2열 열선','69만'],['컴포트 Ⅱ · 양문 전동시트','74만'],
+          ['파노라마 선루프','109만 / +루프랙 116만'],['파킹어시스트 Ⅰ','123만'],
+          ['플래티넘','109만'],['빌트인 캠2 + AR 내비','45만'],['HTRAC 4WD','198만']],
+    builds:[
+      {t:'공간 우선 — 가솔린 H-Pick', d:'파노라마 선루프 109 + 빌트인캠2 45 · HDA·양문 전동시트·2열 열선 기본', p:3355},
+      {t:'하이브리드 — HEV 모던', d:'인포테인먼트 내비 59 + 현대 스마트센스 40 · 그 이상은 어려움', p:3417}
+    ],
+    fn:'가솔린 12.5km/ℓ(17·18인치), 하이브리드 16.2km/ℓ. H-Pick이 예산 내 가성비 정점이다.'
+  },
+  {
+    name:'기아 스포티지', cls:'준중형 SUV', note:'2027년형으로 넘어오며 가격 인상',
+    trims:[['가솔린 프레스티지',2944],['가솔린 노블레스',3322],['가솔린 시그니처',3557],
+           ['LPG 프레스티지',3009],['HEV 프레스티지',3436],['HEV 노블레스',3803]],
+    opts:[['컴포트 Ⅰ · 파워시트 + 통풍 + 하이패스','104만'],['스타일 · LED 헤드램프 + 18인치','69만 / 노블레스 89만'],
+          ['드라이브 와이즈 · HDA2','91만'],['파노라마 선루프','119만 / 노블레스↑ 109만'],
+          ['모니터링 · 서라운드뷰 + 원격주차','114만'],['컴포트 Ⅱ · 2열 열선 + 디지털키2','59만'],
+          ['KRELL 프리미엄 사운드','59만'],['헤드업 디스플레이','59만'],['전자식 4WD','223만']],
+    builds:[
+      {t:'옵션 우선 — 가솔린 프레스티지', d:'컴포트Ⅰ 104 + 스타일 69 + 파노라마 선루프 119 + 빌트인캠2 45', p:3281},
+      {t:'트림 우선 — 가솔린 노블레스', d:'컴포트Ⅱ 59 + 빌트인캠2 45', p:3426},
+      {t:'하이브리드 — HEV 프레스티지', d:'옵션을 하나도 넣을 수 없다', p:3436, tight:true}
+    ],
+    fn:'가솔린 12.3km/ℓ(17인치), 하이브리드 16.3km/ℓ. 프레스티지도 고속도로 주행보조와 12.3인치 내비가 기본이라, 노블레스 깡통보다 프레스티지 옵션형이 낫다.'
+  }
+];
+
+document.getElementById('models').innerHTML = MODELS.map(m => {
+  const rows = m.trims.map(([t, p]) => {
+    const r = real(p), over = r > BUDGET;
+    return '<tr><td>' + t + '</td><td class="num">' + won(p) + '</td><td class="num">' + won(r)
+      + '</td><td><span class="tag ' + (over ? 'over' : 'pass') + '">'
+      + (over ? '초과 ' + won(r - BUDGET) : '여유 ' + won(BUDGET - r)) + '</span></td></tr>';
+  }).join('');
+  const opts = m.opts.map(([n, p]) => '<li><span>' + n + '</span><span class="p">' + p + '</span></li>').join('');
+  const builds = m.builds.map(b =>
+    '<div class="build' + (b.tight ? ' tight' : '') + '">'
+    + '<div class="bt">' + b.t + '</div><div class="bd">' + b.d + '</div>'
+    + '<div class="bp">차량가 ' + won(b.p) + ' → 실구매 ' + won(real(b.p))
+    + ' <span style="color:var(--steel);font-weight:400">· 여유 ' + won(BUDGET - real(b.p)) + '</span></div></div>'
+  ).join('');
+  return '<article class="model">'
+    + '<div class="model-head"><span class="model-name">' + m.name + '</span>'
+    + '<span class="model-class">' + m.cls + '</span>'
+    + '<span class="model-note">' + m.note + '</span></div>'
+    + '<div class="model-body">'
+    + '<div class="model-col"><p class="subhead">트림별 실구매가</p><div class="tscroll"><table style="min-width:360px">'
+    + '<thead><tr><th>트림</th><th class="num">차량가</th><th class="num">실구매가</th><th>판정</th></tr></thead>'
+    + '<tbody>' + rows + '</tbody></table></div>'
+    + '<p class="fn">' + m.fn + '</p></div>'
+    + '<div class="model-col"><p class="subhead">주요 선택 옵션</p><ul class="opts">' + opts + '</ul>'
+    + '<p class="subhead" style="margin-top:22px">예산 내 조합</p>' + builds + '</div>'
+    + '</div></article>';
+}).join('');
+
+/* ---------- 추천 3안 ---------- */
+const PICKS = [
+  {role:'연비·유지비 우선', car:'코나 하이브리드 H-Pick', spec:'19.8 km/ℓ · 연비 1등급 · 소형',
+   opts:['베스트 셀렉션 79만','파킹어시스트 99만','빌트인 캠2 45만','컨비니언스 40만'], p:3383,
+   why:'5종 통틀어 연비 1위. 예산 안에서 고속도로 주행보조와 서라운드뷰까지 챙길 수 있는 유일한 하이브리드 조합이다.'},
+  {role:'공간·차급 우선', car:'투싼 가솔린 H-Pick', spec:'12.5 km/ℓ · 준중형',
+   opts:['파노라마 선루프 109만','빌트인 캠2 45만','HDA·양문 전동시트·2열 열선 기본'], p:3355,
+   why:'준중형 차체에 고속도로 주행보조와 양문 전동시트가 기본이다. 짐과 뒷좌석을 자주 쓴다면 이쪽.'},
+  {role:'옵션 만족도 우선', car:'셀토스 가솔린 시그니처', spec:'12.0 km/ℓ · 소형',
+   opts:['드라이브 와이즈 79만','파노라마 선루프 109만','빌트인 캠2 45만'], p:3378,
+   why:'차로변경 보조까지 되는 HDA2에 파노라마 선루프와 디지털키2까지. 체감 사양이 가장 화려하다.'}
+];
+document.getElementById('picks').innerHTML = PICKS.map(k =>
+  '<article class="pick"><div class="role">' + k.role + '</div>'
+  + '<div class="car">' + k.car + '</div><div class="spec">' + k.spec + '</div>'
+  + '<ul>' + k.opts.map(o => '<li>· ' + o + '</li>').join('') + '</ul>'
+  + '<div class="price"><div class="lab">차량가 ' + won(k.p) + ' → 실구매</div>'
+  + '<div class="v">' + won(real(k.p)) + '</div>'
+  + '<div class="lab" style="margin-top:2px">여유 ' + won(BUDGET - real(k.p)) + '</div></div>'
+  + '<p class="why">' + k.why + '</p></article>'
+).join('');
+
+/* ---------- 연료비 ---------- */
+const KM = 15000, LITER = 1860;
+const FUEL = [
+  ['코나 하이브리드 H-Pick (17인치)', 19.8],
+  ['셀토스 하이브리드 프레스티지 (18인치)', 18.6],
+  ['스포티지 하이브리드 프레스티지 (17인치)', 16.3],
+  ['투싼 하이브리드 모던 (17인치)', 16.2],
+  ['트레일블레이저 RS (18인치)', 12.6],
+  ['투싼 가솔린 H-Pick (18인치)', 12.5],
+  ['코나 가솔린 인스퍼레이션 (19인치)', 12.2],
+  ['셀토스 가솔린 시그니처 (18인치)', 12.0],
+  ['스포티지 가솔린 프레스티지 + 스타일 (18인치)', 12.0]
+];
+const best = Math.min(...FUEL.map(([, e]) => KM / e * LITER));
+document.querySelector('#fuelTable tbody').innerHTML = FUEL.map(([n, e]) => {
+  const y = KM / e * LITER, diff = (y - best) * 5;
+  return '<tr><td>' + n + '</td><td class="num">' + e.toFixed(1) + ' km/ℓ</td>'
+    + '<td class="num">' + Math.round(y / 10000).toLocaleString('ko-KR') + '만원</td>'
+    + '<td class="num">' + Math.round(y * 5 / 10000).toLocaleString('ko-KR') + '만원</td>'
+    + '<td class="num">' + (diff < 5000 ? '—' : '+' + Math.round(diff / 10000).toLocaleString('ko-KR') + '만원') + '</td></tr>';
+}).join('');
+</script>

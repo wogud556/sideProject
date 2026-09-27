@@ -1,0 +1,5 @@
+- vsc
+- cursor
+  - vsc 기반 ai기능이 들어간 ide 라고 보면 됨
+- antigravity
+  - xj

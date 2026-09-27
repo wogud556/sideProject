@@ -1,0 +1,29 @@
+{
+  "name": "passage-quiz-mcp",
+  "version": "0.1.0",
+  "description": "지문을 읽어 독해 문제를 생성하는 MCP 서버 샘플",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "typescript": "^7.0.2"
+  },
+  "bin": {
+    "passage-quiz-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "samples"
+  ]
+}
