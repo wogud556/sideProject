@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { LoanApplicationResponse, ScreeningResponse } from '../api/screening_api'
+import type { LoanApplicationResponse, ScreeningResponse } from '../api/screening_api'
 
 interface LoanApplicationState {
   currentApplication: LoanApplicationResponse | null

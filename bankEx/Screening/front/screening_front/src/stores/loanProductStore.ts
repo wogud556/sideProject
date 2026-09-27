@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { LoanProduct } from '../api/screening_api'
+import type { LoanProduct } from '../api/screening_api'
 
 interface LoanProductState {
   products: LoanProduct[]

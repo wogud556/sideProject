@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getProfile, UserProfile } from '../api/screening_api'
+import { getProfile } from '../api/screening_api'
+import type { UserProfile } from '../api/screening_api'
 import { useAuthStore } from '../stores/authStore'
 import { useLoanApplicationStore } from '../stores/loanApplicationStore'
 import { useMyApplicationStore } from '../stores/myApplicationStore'
