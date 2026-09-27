@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hanati.bank.bankEx.deposit.fixed.mapper.FixedDepositAccountMapper">
+
+    <select id="findByDepositAccountId" resultType="com.hanati.bank.bankEx.deposit.fixed.domain.FixedDepositAccount">
+        SELECT DEPOSIT_ACCOUNT_ID, USER_ID, DEPOSIT_PRODUCT_ID, WITHDRAW_ACCOUNT_NO, PRINCIPAL_AMOUNT,
+               INTEREST_RATE, START_DATE, MATURITY_DATE, EXPECTED_INTEREST, EXPECTED_MATURITY_AMOUNT,
+               STATUS, CREATED_AT, UPDATED_AT
+        FROM FIXED_DEPOSIT_ACCOUNT
+        WHERE DEPOSIT_ACCOUNT_ID = #{depositAccountId}
+    </select>
+
+    <select id="findDueForMaturity" resultType="com.hanati.bank.bankEx.deposit.fixed.domain.FixedDepositAccount">
+        SELECT DEPOSIT_ACCOUNT_ID, USER_ID, DEPOSIT_PRODUCT_ID, WITHDRAW_ACCOUNT_NO, PRINCIPAL_AMOUNT,
+               INTEREST_RATE, START_DATE, MATURITY_DATE, EXPECTED_INTEREST, EXPECTED_MATURITY_AMOUNT,
+               STATUS, CREATED_AT, UPDATED_AT
+        FROM FIXED_DEPOSIT_ACCOUNT
+        WHERE STATUS = 'ACTIVE' AND MATURITY_DATE &lt;= #{today}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO FIXED_DEPOSIT_ACCOUNT
+            (DEPOSIT_ACCOUNT_ID, USER_ID, DEPOSIT_PRODUCT_ID, WITHDRAW_ACCOUNT_NO, PRINCIPAL_AMOUNT,
+             INTEREST_RATE, START_DATE, MATURITY_DATE, EXPECTED_INTEREST, EXPECTED_MATURITY_AMOUNT,
+             STATUS, CREATED_AT, UPDATED_AT)
+        VALUES
+            (#{depositAccountId}, #{userId}, #{depositProductId}, #{withdrawAccountNo}, #{principalAmount},
+             #{interestRate}, #{startDate}, #{maturityDate}, #{expectedInterest}, #{expectedMaturityAmount},
+             #{status}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="update">
+        UPDATE FIXED_DEPOSIT_ACCOUNT
+        SET STATUS = #{status},
+            UPDATED_AT = #{updatedAt}
+        WHERE DEPOSIT_ACCOUNT_ID = #{depositAccountId}
+    </update>
+
+</mapper>

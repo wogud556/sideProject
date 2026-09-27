@@ -7,7 +7,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@MapperScan({"com.hanati.bank.bankEx.loan", "com.hanati.bank.bankEx.deposit.savings"})
+@MapperScan({"com.hanati.bank.bankEx.loan", "com.hanati.bank.bankEx.deposit.savings",
+		"com.hanati.bank.bankEx.deposit.fixed"})
 public class BankExApplication {
 
 	public static void main(String[] args) {

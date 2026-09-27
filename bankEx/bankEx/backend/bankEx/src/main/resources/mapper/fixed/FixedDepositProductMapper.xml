@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hanati.bank.bankEx.deposit.fixed.mapper.FixedDepositProductMapper">
+
+    <select id="findAllOnSale" resultType="com.hanati.bank.bankEx.deposit.fixed.domain.FixedDepositProduct">
+        SELECT DEPOSIT_PRODUCT_ID, PRODUCT_NAME, MINIMUM_AMOUNT, MAXIMUM_AMOUNT, TERM_MONTHS,
+               INTEREST_RATE, EARLY_TERMINATION_RATE, STATUS, CREATED_AT
+        FROM FIXED_DEPOSIT_PRODUCT
+        WHERE STATUS = 'ON_SALE'
+    </select>
+
+    <select id="findById" resultType="com.hanati.bank.bankEx.deposit.fixed.domain.FixedDepositProduct">
+        SELECT DEPOSIT_PRODUCT_ID, PRODUCT_NAME, MINIMUM_AMOUNT, MAXIMUM_AMOUNT, TERM_MONTHS,
+               INTEREST_RATE, EARLY_TERMINATION_RATE, STATUS, CREATED_AT
+        FROM FIXED_DEPOSIT_PRODUCT
+        WHERE DEPOSIT_PRODUCT_ID = #{depositProductId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO FIXED_DEPOSIT_PRODUCT
+            (DEPOSIT_PRODUCT_ID, PRODUCT_NAME, MINIMUM_AMOUNT, MAXIMUM_AMOUNT, TERM_MONTHS,
+             INTEREST_RATE, EARLY_TERMINATION_RATE, STATUS, CREATED_AT)
+        VALUES
+            (#{depositProductId}, #{productName}, #{minimumAmount}, #{maximumAmount}, #{termMonths},
+             #{interestRate}, #{earlyTerminationRate}, #{status}, #{createdAt})
+    </insert>
+
+</mapper>

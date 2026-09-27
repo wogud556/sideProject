@@ -98,7 +98,7 @@ Oracle is only wired up for `bankEx`'s `prod` profile
 
 Both ORMs are used side by side in `bankEx`, split by domain:
 - **JPA** — `login`, `deposit/general`, `deposit/transfer`
-- **MyBatis** — `deposit/savings`, `loan/general`, `loan/jeonse`
+- **MyBatis** — `deposit/savings`, `deposit/fixed`, `loan/general`, `loan/jeonse`
   (XML in `src/main/resources/mapper/<domain>/`, `map-underscore-to-camel-case: true`)
 
 ---
@@ -113,6 +113,7 @@ Base path `/api/bank/user`. Package root `com.hanati.bank.bankEx`.
 | Accounts (수신 일반) | `deposit/general/` | `GET /accounts`, `GET /accounts/{accountNumber}`, `POST /accounts`, `POST /accounts/{accountNumber}/close` |
 | Transactions | `deposit/general/` | `POST /accounts/{n}/deposit`, `POST /accounts/{n}/withdraw`, `GET /accounts/{n}/transactions` |
 | Savings (적금) | `deposit/savings/` | `/deposit/savings/products`, `/accounts`, `/accounts/{no}`, `/accounts/{no}/payment`, `/accounts/{no}/cancel`, `/scheduler/auto-transfer`, `/scheduler/maturity` |
+| Fixed deposit (정기예금) | `deposit/fixed/` | `/fixed-deposits/products`, `POST /fixed-deposits`, `/fixed-deposits/{depositAccountId}`, `/{depositAccountId}/maturity-preview`, `/{depositAccountId}/terminate`, `/scheduler/maturity` |
 | Transfer (이체) | `deposit/transfer/` | `/transfers/accounts/{n}/holder`, `POST /transfers`, `GET /transfers/{id}` |
 | Loans (여신 일반) | `loan/general/` | `/loan/products`, `/loan/products/{id}`, `/loan/apply`, `/loan/applications`, `/loan/validate-customer-account`, `/loan/applications/{id}/approve`, `/loan/disbursement`, `/loan/repayment` |
 | Loan repayment | `loan/general/` | `/loans/{id}/repay`, `/loans/{id}/repayment-preview`, `/loans/{id}/repayment-history` |
@@ -237,7 +238,7 @@ starting work on its domain — they are detailed enough to implement from direc
 | `전세.md` | 304 | ✅ implemented (`bankEx/loan/jeonse`) |
 | `대환.md` | 1405 | ✅ implemented (`대환/`, see `report/20260812.md`) |
 | `기타구현해야하는.md` | 579 | 🟡 partial (loan interest/repayment schedule done) |
-| `기타구현해야하는_2.md` | 857 | 🟡 partial (savings prototype done) |
+| `기타구현해야하는_2.md` | 857 | 🟡 partial (§3 대출이자, §4 정기예금 done; §5 카드 / §6 외환 / §7 알림 / §8 OTP / §9 Screening 정리 not started) |
 | `주담대.md` | 447 | ❌ **not started** — no mortgage/collateral code exists anywhere |
 
 `report/` holds dated implementation reports (`20260602` → `20260812`). Each documents
@@ -266,6 +267,19 @@ Follow the existing generator when adding an entity that needs a formatted numbe
 **Masking** — `NameMaskUtil` for customer names in responses.
 
 **Domain enums** live in the domain's `enums/` (or `domain/` in `대환`), not in `common/`.
+
+**Registering a new MyBatis domain** — `BankExApplication` carries an explicit
+`@MapperScan({...})` listing packages one by one, so a new `@Mapper` interface is NOT
+picked up automatically. Add its package there or the context fails at startup with
+`No qualifying bean of type '...Mapper'`. Mapper XML under `src/main/resources/mapper/<domain>/`
+is found by the `classpath:mapper/**/*.xml` glob without extra config, and new tables go in
+`schema.sql` (auto-run on H2 only — mirror them into Oracle by hand).
+
+**Injecting the business date** — services whose result depends on "today" take a
+`LocalDate` parameter and let the controller pass `LocalDate.now()`
+(`savingsMaturityService.execute(today)`, `autoTransferService.execute(date)`,
+`FixedDepositService.terminate(id, today)`). Keeps date-dependent rules testable; don't
+call `LocalDate.now()` deep inside such a service.
 
 **Type imports** — all three frontends set `verbatimModuleSyntax: true`, so a type must be
 imported as `import type { X } from '...'`. A plain `import { X }` for a type fails the
