@@ -9,20 +9,27 @@ directory (`sideProject/`), but all working code lives under `sideProject/bankEx
 which is the effective project root and where this file sits.
 
 ```
-bankEx/                      ← effective root (you are here)
-├─ bankEx/                   1. Main banking app      (Spring Boot :8080 + React :5173)
-├─ Screening/                2. Loan screening system (Spring Boot :8081 + React :5174)
-├─ 대환/                      3. Loan refinancing      (Spring Boot :8082 + React :5175)
-├─ bankExNative/             4. Android WebView shell (Kotlin + Compose)
-├─ SystemInspectorEx/        5. Code-inspector MCP server (TypeScript)
-├─ 명세/                      Development specs (source of truth for new work)
-└─ report/                   Dated implementation reports
+bankEx/                          ← effective root (you are here)
+├─ Mobile/                       the customer-facing web app and its native shell
+│   ├─ bankEx/                   1. Main banking app      (Spring Boot :8080 + React :5173)
+│   └─ bankExNative/             2. Android WebView shell (Kotlin + Compose)
+├─ Core/                         back-office business services (no mobile client)
+│   ├─ Screening/                3. Loan screening system (Spring Boot :8081 + React :5174)
+│   └─ 대환/                      4. Loan refinancing      (Spring Boot :8082 + React :5175)
+└─ Etc/                          everything that is not a banking service
+    ├─ 명세/                      Development specs (source of truth for new work)
+    ├─ report/                   Dated implementation reports
+    └─ SystemInspectorEx/        5. Code-inspector MCP server (TypeScript)
 ```
 
-Projects 1–3 are **independent Spring Boot applications** with separate ports and
+The `Mobile` / `Core` / `Etc` grouping is organisational only — it introduces no shared
+build, no parent Gradle project, and no cross-directory imports. Each of the five
+projects still builds and runs entirely on its own.
+
+Projects 1, 3 and 4 are **independent Spring Boot applications** with separate ports and
 separate in-memory databases. They do not call each other. Shared conventions were
-copied, not extracted into a library — `bankEx` is the original, `Screening` and
-`대환` followed its patterns.
+copied, not extracted into a library — `Mobile/bankEx` is the original, `Core/Screening`
+and `Core/대환` followed its patterns.
 
 All three backends use `group = com.hanati.bank`, Spring Boot 4.0.5, Java 17, Gradle,
 Lombok, JPA + MyBatis, and H2 (local) / Oracle (prod). All three frontends use
@@ -45,9 +52,9 @@ Each backend and frontend is its own build. `cd` into the directory first.
 ### Backends
 | Project | Directory | Port |
 |---|---|---|
-| bankEx | `bankEx/backend/bankEx/` | 8080 |
-| Screening | `Screening/backend/screening/` | 8081 |
-| 대환 | `대환/backend/refinance/` | 8082 |
+| bankEx | `Mobile/bankEx/backend/bankEx/` | 8080 |
+| Screening | `Core/Screening/backend/screening/` | 8081 |
+| 대환 | `Core/대환/backend/refinance/` | 8082 |
 
 ```bash
 ./gradlew bootRun         # start server
@@ -60,9 +67,9 @@ Each backend and frontend is its own build. `cd` into the directory first.
 ### Frontends
 | Project | Directory | Port |
 |---|---|---|
-| bankEx | `bankEx/front/bankEx_Front/` | 5173 (Vite default, `host: true`) |
-| Screening | `Screening/front/screening_front/` | 5174 |
-| 대환 | `대환/front/refinance_front/` | 5175 |
+| bankEx | `Mobile/bankEx/front/bankEx_Front/` | 5173 (Vite default, `host: true`) |
+| Screening | `Core/Screening/front/screening_front/` | 5174 |
+| 대환 | `Core/대환/front/refinance_front/` | 5175 |
 
 ```bash
 npm run dev      # dev server
@@ -72,13 +79,13 @@ npm run preview  # preview production build
 npx tsc -b       # type-check only (used between phases)
 ```
 
-### Android (`bankExNative/`)
+### Android (`Mobile/bankExNative/`)
 ```bash
 ./gradlew assembleDebug   # build APK
 ./gradlew test            # unit tests
 ```
 
-### MCP server (`SystemInspectorEx/project-code-inspector-mcp/`)
+### MCP server (`Etc/SystemInspectorEx/project-code-inspector-mcp/`)
 ```bash
 npm run build
 ```
@@ -103,7 +110,7 @@ Both ORMs are used side by side in `bankEx`, split by domain:
 
 ---
 
-## Project 1: `bankEx/` — Main banking app
+## Project 1: `Mobile/bankEx/` — Main banking app
 
 Base path `/api/bank/user`. Package root `com.hanati.bank.bankEx`.
 
@@ -127,7 +134,7 @@ Each domain package is flat: `controller/ service/ dto/ (entity|domain)/ (reposi
 - `util/` — `AccountNoGenerator`, `CustomerNoGenerator`, `TransactionNoGenerator`,
   `JeonseApplicationNoGenerator`, `JeonseContractNoGenerator`, `NameMaskUtil`
 
-Frontend (`bankEx/front/bankEx_Front/src/`):
+Frontend (`Mobile/bankEx/front/bankEx_Front/src/`):
 - `api/axios.ts` — `baseURL: http://${window.location.hostname}:8080/api/bank/user`
   (hostname is dynamic so the Android WebView can reach it), 5s timeout
 - `api/bank_api.ts` — typed request/response interfaces per endpoint
@@ -142,7 +149,31 @@ Tests: 16 files under `src/test/`, mixing flow/integration tests
 
 ---
 
-## Project 2: `Screening/` — Loan screening system
+## Project 2: `Mobile/bankExNative/` — Android WebView shell
+
+Kotlin + Jetpack Compose. Wraps the `bankEx` frontend in a WebView; it contains no
+banking logic of its own.
+
+- `config/WebConfig.kt` — `BASE_URL = http://10.0.2.2:5173` (emulator's route to host
+  localhost), custom user agent `BankExNative/1.0 Android`
+- `webview/` — `WebViewConfigurator`, `AppWebViewClient`, `AppWebChromeClient`
+- `network/NetworkChecker` + `ui/ErrorScreen` — offline handling
+- `res/xml/network_security_config.xml` — permits cleartext to the dev host
+- Tests: `WebViewUrlTest`, `WebViewConfiguratorTest`, `BackNavigationTest`,
+  `NetworkCheckerTest`, `AppWebViewClientTest`
+
+⚠️ `./gradlew test` here fails 1 of 23: `WebViewUrlTest > 빈 URL은 에러 처리를 유발해야 한다`
+throws `MockKException: Can't instantiate proxy for class kotlin.Function1`. It is a MockK
+limitation on mocking a Kotlin lambda type, not a logic bug — pre-existing and unrelated to
+the directory layout. Treat "22/23 passing" as this module's baseline.
+
+Also note `./gradlew test --tests <name>` is rejected here (`Unknown command-line option
+'--tests'`) because the Android plugin's `test` is an aggregate task; use
+`:app:testDebugUnitTest --tests <name>` instead.
+
+---
+
+## Project 3: `Core/Screening/` — Loan screening system
 
 Base path `/api/screening`. Package root `com.hanati.bank.screening`.
 
@@ -163,10 +194,10 @@ Frontend uses **Zustand** stores (`authStore`, `loanProductStore`, `loanApplicat
 
 ---
 
-## Project 3: `대환/` — Loan refinancing (newest, 2026-08-12)
+## Project 4: `Core/대환/` — Loan refinancing
 
-Base path `/api`. Package root `com.hanati.bank.refinance`. See `report/20260812.md`
-for the full build log and `명세/대환.md` for the spec (39 sections).
+Base path `/api`. Package root `com.hanati.bank.refinance`. See `Etc/report/20260812.md`
+for the full build log and `Etc/명세/대환.md` for the spec (39 sections).
 
 Packages:
 - `refinance/` — the core domain: `domain/` (status machine), `entity/`, `repository/`,
@@ -198,22 +229,7 @@ RefinanceExecution, plus FailureRetry and ApplicationHistory. Zustand stores:
 
 ---
 
-## Project 4: `bankExNative/` — Android WebView shell
-
-Kotlin + Jetpack Compose. Wraps the `bankEx` frontend in a WebView; it contains no
-banking logic of its own.
-
-- `config/WebConfig.kt` — `BASE_URL = http://10.0.2.2:5173` (emulator's route to host
-  localhost), custom user agent `BankExNative/1.0 Android`
-- `webview/` — `WebViewConfigurator`, `AppWebViewClient`, `AppWebChromeClient`
-- `network/NetworkChecker` + `ui/ErrorScreen` — offline handling
-- `res/xml/network_security_config.xml` — permits cleartext to the dev host
-- Tests: `WebViewUrlTest`, `WebViewConfiguratorTest`, `BackNavigationTest`,
-  `NetworkCheckerTest`, `AppWebViewClientTest`
-
----
-
-## Project 5: `SystemInspectorEx/` — Code-inspector MCP server
+## Project 5: `Etc/SystemInspectorEx/` — Code-inspector MCP server
 
 TypeScript MCP server (`project-code-inspector-mcp/`) that indexes and patches a
 codebase. Unrelated to the banking domain.
@@ -228,20 +244,22 @@ codebase. Unrelated to the banking domain.
 
 ## Specs and reports
 
-`명세/` holds the development specs that drive this repo. Read the relevant one before
+`Etc/명세/` holds the development specs that drive this repo. Read the relevant one before
 starting work on its domain — they are detailed enough to implement from directly.
+
+Paths in the Status column are packages inside `Mobile/bankEx`'s backend unless noted.
 
 | Spec | Lines | Status |
 |---|---|---|
 | `수신기본.md` | 817 | ✅ implemented (`bankEx` login + deposit/general) |
 | `이체.md` | 426 | ✅ implemented (`bankEx/deposit/transfer`) |
 | `전세.md` | 304 | ✅ implemented (`bankEx/loan/jeonse`) |
-| `대환.md` | 1405 | ✅ implemented (`대환/`, see `report/20260812.md`) |
+| `대환.md` | 1405 | ✅ implemented (`Core/대환/`, see `Etc/report/20260812.md`) |
 | `기타구현해야하는.md` | 579 | 🟡 partial (loan interest/repayment schedule done) |
 | `기타구현해야하는_2.md` | 857 | 🟡 partial (§3 대출이자, §4 정기예금 done; §5 카드 / §6 외환 / §7 알림 / §8 OTP / §9 Screening 정리 not started) |
 | `주담대.md` | 447 | ❌ **not started** — no mortgage/collateral code exists anywhere |
 
-`report/` holds dated implementation reports (`20260602` → `20260812`). Each documents
+`Etc/report/` holds dated implementation reports (`20260602` → `20260927`). Each documents
 what was built, decisions taken, and scope deliberately cut. Write one after completing
 a spec.
 
