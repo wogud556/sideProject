@@ -28,12 +28,12 @@ com.hanati.bank.refinance
 └─ audit/          TB_AUDIT_LOG 감사로그
 ```
 
-기존 프로젝트(`bankEx`, `Screening`)와 동일하게 **도메인별 평평한 패키지 구조**(`controller/service/entity/dto/repository`)를 사용했습니다. `RefinanceApplication` 엔티티에 `@Version`을 적용해 낙관적 락 기반 동시성 제어를 하며, 실행/재처리처럼 중요한 상태 전이는 상태조건부 UPDATE(`updateStatusIfMatch`)로 한 번 더 보호합니다.
+기존 프로젝트(`Mobile/bankEx`, `Core/Screening`)와 동일하게 **도메인별 평평한 패키지 구조**(`controller/service/entity/dto/repository`)를 사용했습니다. `RefinanceApplication` 엔티티에 `@Version`을 적용해 낙관적 락 기반 동시성 제어를 하며, 실행/재처리처럼 중요한 상태 전이는 상태조건부 UPDATE(`updateStatusIfMatch`)로 한 번 더 보호합니다.
 
 ## 4. 디렉터리 구조
 
 ```
-대환/
+Core/refinancing/
 ├─ backend/refinance/     Spring Boot 백엔드 (포트 8082)
 └─ front/refinance_front/ React 프론트엔드 (포트 5175)
 ```
@@ -43,7 +43,7 @@ com.hanati.bank.refinance
 ### Backend
 
 ```bash
-cd 대환/backend/refinance
+cd Core/refinancing/backend/refinance
 ./gradlew bootRun     # http://localhost:8082, local 프로파일(H2) 기본 활성화
 ./gradlew test        # 단위 + 통합 테스트
 ```
@@ -51,7 +51,7 @@ cd 대환/backend/refinance
 ### Frontend
 
 ```bash
-cd 대환/front/refinance_front
+cd Core/refinancing/front/refinance_front
 npm install
 npm run dev            # http://localhost:5175
 ```
@@ -60,7 +60,7 @@ npm run dev            # http://localhost:5175
 
 ## 6. Oracle 설정 / 테이블 생성
 
-운영 Oracle 반영 시 `대환/backend/refinance/src/main/resources/oracle-ddl.sql`을 수동으로 실행합니다 (H2처럼 자동 실행되지 않음). `application.yml`에 `spring.datasource`를 Oracle 접속 정보로 교체하고 `ojdbc11` 드라이버(이미 `build.gradle`에 런타임 의존성으로 포함됨)를 사용하면 됩니다.
+운영 Oracle 반영 시 `Core/refinancing/backend/refinance/src/main/resources/oracle-ddl.sql`을 수동으로 실행합니다 (H2처럼 자동 실행되지 않음). `application.yml`에 `spring.datasource`를 Oracle 접속 정보로 교체하고 `ojdbc11` 드라이버(이미 `build.gradle`에 런타임 의존성으로 포함됨)를 사용하면 됩니다.
 
 ## 7. Mock 데이터
 

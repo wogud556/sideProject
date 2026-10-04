@@ -15,21 +15,22 @@ bankEx/                          ← effective root (you are here)
 │   └─ bankExNative/             2. Android WebView shell (Kotlin + Compose)
 ├─ Core/                         back-office business services (no mobile client)
 │   ├─ Screening/                3. Loan screening system (Spring Boot :8081 + React :5174)
-│   └─ 대환/                      4. Loan refinancing      (Spring Boot :8082 + React :5175)
+│   ├─ refinancing/              4. Loan refinancing      (Spring Boot :8082 + React :5175)
+│   └─ repayment/                5. Loan repayment core   (Spring Boot :8083, no frontend)
 └─ Etc/                          everything that is not a banking service
     ├─ 명세/                      Development specs (source of truth for new work)
     ├─ report/                   Dated implementation reports
-    └─ SystemInspectorEx/        5. Code-inspector MCP server (TypeScript)
+    └─ SystemInspectorEx/        6. Code-inspector MCP server (TypeScript)
 ```
 
 The `Mobile` / `Core` / `Etc` grouping is organisational only — it introduces no shared
 build, no parent Gradle project, and no cross-directory imports. Each of the five
 projects still builds and runs entirely on its own.
 
-Projects 1, 3 and 4 are **independent Spring Boot applications** with separate ports and
+Projects 1, 3, 4 and 5 are **independent Spring Boot applications** with separate ports and
 separate in-memory databases. They do not call each other. Shared conventions were
 copied, not extracted into a library — `Mobile/bankEx` is the original, `Core/Screening`
-and `Core/대환` followed its patterns.
+and `Core/refinancing` followed its patterns.
 
 All three backends use `group = com.hanati.bank`, Spring Boot 4.0.5, Java 17, Gradle,
 Lombok, JPA + MyBatis, and H2 (local) / Oracle (prod). All three frontends use
@@ -54,7 +55,8 @@ Each backend and frontend is its own build. `cd` into the directory first.
 |---|---|---|
 | bankEx | `Mobile/bankEx/backend/bankEx/` | 8080 |
 | Screening | `Core/Screening/backend/screening/` | 8081 |
-| 대환 | `Core/대환/backend/refinance/` | 8082 |
+| refinancing | `Core/refinancing/backend/refinance/` | 8082 |
+| repayment | `Core/repayment/backend/repayment/` | 8083 |
 
 ```bash
 ./gradlew bootRun         # start server
@@ -69,7 +71,7 @@ Each backend and frontend is its own build. `cd` into the directory first.
 |---|---|---|
 | bankEx | `Mobile/bankEx/front/bankEx_Front/` | 5173 (Vite default, `host: true`) |
 | Screening | `Core/Screening/front/screening_front/` | 5174 |
-| 대환 | `Core/대환/front/refinance_front/` | 5175 |
+| refinancing | `Core/refinancing/front/refinance_front/` | 5175 |
 
 ```bash
 npm run dev      # dev server
@@ -194,7 +196,7 @@ Frontend uses **Zustand** stores (`authStore`, `loanProductStore`, `loanApplicat
 
 ---
 
-## Project 4: `Core/대환/` — Loan refinancing
+## Project 4: `Core/refinancing/` — Loan refinancing
 
 Base path `/api`. Package root `com.hanati.bank.refinance`. See `Etc/report/20260812.md`
 for the full build log and `Etc/명세/대환.md` for the spec (39 sections).
@@ -229,7 +231,49 @@ RefinanceExecution, plus FailureRetry and ApplicationHistory. Zustand stores:
 
 ---
 
-## Project 5: `Etc/SystemInspectorEx/` — Code-inspector MCP server
+## Project 5: `Core/repayment/` — Loan repayment core
+
+Base path `/api/loans`. Package root `com.hanati.bank.repayment`. **Backend only** — the
+spec (`Etc/명세/상환.md`) defines a loan-core service, not a screen feature. See
+`Etc/report/20261004.md`.
+
+Flat package layout (`entity/ repository/ service/ controller/ dto/ enums/`) plus
+`policy/`, `gateway/`, `common/`. JPA only (no MyBatis).
+
+| Concern | Where |
+|---|---|
+| Allocation priority | `policy/DefaultRepaymentAllocationPolicy` — 비용 → 연체이자 → 정상이자 → 연체원금 → 정상원금 → 과오납 |
+| Policy selection | `policy/RepaymentAllocationPolicySelector` keyed on `LoanAccount.productType` |
+| Balance mutation | `service/DebtBalanceApplier` — one method applies both repayment (`sign=+1`) and reversal (`sign=-1`) |
+| Quote vs execution | `service/RepaymentQuoteService` is shared so a full-repayment quote and its execution cannot drift |
+| Concurrency | `LoanAccountRepository.findByIdForUpdate` (pessimistic write lock) + unique `IDEMPOTENCY_KEY` |
+| Accounting | `entity/AccountingEvent` outbox, written in the same transaction |
+| External withdrawal | `gateway/WithdrawalGateway` + `MockWithdrawalGateway` (`DemoScenarioAccounts` forces failures) |
+
+Endpoints: `GET /{id}/repayment-quote`, `POST /{id}/repayments`, `POST /{id}/repayments/full`,
+`POST /{id}/repayments/{transactionNumber}/reversal`, `GET /{id}/repayments`,
+`GET /{id}/repayments/{transactionNumber}`, `POST /{id}/overpayments/{overpaymentId}/refund`.
+Read-only helpers: `GET /api/loans`, `GET /{id}`, `GET /{id}/schedules`, `GET /{id}/overpayments`.
+
+⚠️ **No loan-origination API.** Loan accounts and schedules come from `config/DataInitializer`
+or test fixtures — disbursement is not this core's responsibility.
+
+⚠️ **Delinquency transition is out of scope.** `overduePrincipal` / `overdueInterest` /
+`feeBalance` exist and are allocated against and reversed correctly, but nothing moves a
+schedule from 정상 to 연체 or accrues 연체이자. Seeds set those buckets directly, and a
+schedule's 정상 and 연체 buckets are kept mutually exclusive by convention.
+
+⚠️ **Prepayment keeps the schedule unchanged** (원금만 감소). The two other policies the spec
+lists — 만기 유지 + 회차 재산정, 납부금액 유지 + 만기 단축 — are not implemented.
+
+Money is `BigDecimal` scale 0, `HALF_UP`, via `common/util/Money`. Never `double`/`float`.
+
+Tests: 56 (allocation policy 15, service flow 23, reversal 13, concurrency 5). The
+concurrency test deliberately omits `@Transactional` so the pessimistic lock actually contends.
+
+---
+
+## Project 6: `Etc/SystemInspectorEx/` — Code-inspector MCP server
 
 TypeScript MCP server (`project-code-inspector-mcp/`) that indexes and patches a
 codebase. Unrelated to the banking domain.
@@ -254,10 +298,11 @@ Paths in the Status column are packages inside `Mobile/bankEx`'s backend unless 
 | `수신기본.md` | 817 | ✅ implemented (`bankEx` login + deposit/general) |
 | `이체.md` | 426 | ✅ implemented (`bankEx/deposit/transfer`) |
 | `전세.md` | 304 | ✅ implemented (`bankEx/loan/jeonse`) |
-| `대환.md` | 1405 | ✅ implemented (`Core/대환/`, see `Etc/report/20260812.md`) |
+| `대환.md` | 1405 | ✅ implemented (`Core/refinancing/`, see `Etc/report/20260812.md`) |
 | `기타구현해야하는.md` | 579 | 🟡 partial (loan interest/repayment schedule done) |
 | `기타구현해야하는_2.md` | 857 | 🟡 partial (§3 대출이자, §4 정기예금 done; §5 카드 / §6 외환 / §7 알림 / §8 OTP / §9 Screening 정리 not started) |
 | `주담대.md` | 447 | ❌ **not started** — no mortgage/collateral code exists anywhere |
+| `상환.md` | 712 | ✅ implemented (`Core/repayment/`, see `Etc/report/20261004.md`) |
 
 `Etc/report/` holds dated implementation reports (`20260602` → `20260927`). Each documents
 what was built, decisions taken, and scope deliberately cut. Write one after completing
@@ -272,11 +317,11 @@ a spec.
   (`loginController`, `accountService`, `jeonseLoanService`) but PascalCase for entities,
   DTOs, repositories, and mappers. Newer files broke the pattern
   (`LoanRepaymentController`, `LoanRepaymentService`).
-- `Screening` and `대환` use PascalCase throughout.
+- `Screening` and `refinancing` use PascalCase throughout.
 
 **Error handling** — throw `BusinessException(ErrorCode.X)`; `GlobalExceptionHandler`
 maps it to `ApiErrorResponse`. Add new codes to the `ErrorCode` enum with a Korean
-user-facing message. `대환` additionally has an `ApiResponse` success wrapper; `bankEx`
+user-facing message. `Core/refinancing` additionally has an `ApiResponse` success wrapper; `bankEx`
 returns DTOs directly.
 
 **ID generation** — hand-rolled generators in `common/util/`, one per entity type.
@@ -284,7 +329,7 @@ Follow the existing generator when adding an entity that needs a formatted numbe
 
 **Masking** — `NameMaskUtil` for customer names in responses.
 
-**Domain enums** live in the domain's `enums/` (or `domain/` in `대환`), not in `common/`.
+**Domain enums** live in the domain's `enums/` (or `domain/` in `Core/refinancing`), not in `common/`.
 
 **Registering a new MyBatis domain** — `BankExApplication` carries an explicit
 `@MapperScan({...})` listing packages one by one, so a new `@Mapper` interface is NOT

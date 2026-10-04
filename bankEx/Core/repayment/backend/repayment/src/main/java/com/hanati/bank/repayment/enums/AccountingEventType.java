@@ -1,0 +1,11 @@
+package com.hanati.bank.repayment.enums;
+
+public enum AccountingEventType {
+    LOAN_PRINCIPAL_REPAID,
+    LOAN_INTEREST_RECEIVED,
+    OVERDUE_INTEREST_RECEIVED,
+    REPAYMENT_REVERSED,
+    OVERPAYMENT_RECEIVED,
+    OVERPAYMENT_REFUNDED,
+    LOAN_PAID_OFF
+}
