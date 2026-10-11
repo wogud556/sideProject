@@ -14,7 +14,7 @@ bankEx/                          ← effective root (you are here)
 │   ├─ bankEx/                   1. Main banking app      (Spring Boot :8080 + React :5173)
 │   └─ bankExNative/             2. Android WebView shell (Kotlin + Compose)
 ├─ Core/                         back-office business services (no mobile client)
-│   ├─ Screening/                3. Loan screening system (Spring Boot :8081 + React :5174)
+│   ├─ Screening/                3. Loan screening for underwriters (Spring Boot :8081 + React :5174)
 │   ├─ refinancing/              4. Loan refinancing      (Spring Boot :8082 + React :5175)
 │   └─ repayment/                5. Loan repayment core   (Spring Boot :8083, no frontend)
 └─ Etc/                          everything that is not a banking service
@@ -175,24 +175,34 @@ Also note `./gradlew test --tests <name>` is rejected here (`Unknown command-lin
 
 ---
 
-## Project 3: `Core/Screening/` — Loan screening system
+## Project 3: `Core/Screening/` — Loan screening (underwriter back-office)
 
-Base path `/api/screening`. Package root `com.hanati.bank.screening`.
+Base path `/api/screenings`. Package root `com.hanati.bank.screening`. Reworked on 2026-10-11
+from a customer app into an underwriter (심사역) tool — see `Etc/report/20261011.md`.
 
-- `POST /users/signup`, `POST /users/login`, `GET /users/{userId}/profile`
-- `GET /products`, `GET /products/{productId}`
-- `POST /applications`, `POST /applications/{id}/screening`,
-  `GET /applications/my/{userId}`, `GET /applications/{id}/result`
+- `POST /loans` — run a screening (`ScreeningRequest`, fields per spec `기타구현해야하는_2.md` §9.3)
+- `GET /` (`?status=` optional), `GET /{screeningId}`
+- `POST /{screeningId}/approve`, `POST /{screeningId}/reject` — reviewer decision, `MANUAL_REVIEW` only
 
-Uses a **flat package layout** (`controller/ service/ entity/ dto/ repository/ engine/ config/`)
-rather than per-domain packages. `engine/LoanScreeningEngine` holds the screening rules.
-`config/` has `CorsConfig`, `SecurityConfig`, `DataInitializer`; password hashing uses
-`spring-security-crypto` (no full Spring Security web stack).
+`engine/LoanScreeningEngine` holds the §9.4 rules (test-only internal criteria, reject rules
+evaluated before manual-review rules): 신용 <600 거절 → 기존대출+신청액 > 연소득×10 거절 →
+신청액 > 연소득×5 수동심사 → 신용 600~699 수동심사 → 승인. Rate tiers by credit score live in
+`interestRateFor`, reused when a reviewer approves.
 
-Frontend uses **Zustand** stores (`authStore`, `loanProductStore`, `loanApplicationStore`,
-`myApplicationStore`) and 8 pages. `api/axios.ts` sets `withCredentials: true`.
+Flat package layout (`controller/ service/ entity/ dto/ repository/ engine/ enums/ exception/ config/`).
+Single entity `LoanScreening` holds request, result and reviewer decision.
+`exception/` mirrors bankEx (`BusinessException` + `ErrorCode` + `GlobalExceptionHandler`, all 400).
 
-⚠️ Backend test coverage is one context-load test (`ScreeningApplicationTests`).
+⚠️ **Not connected to bankEx.** Customer data arrives in the request body; there is no
+customer/credit table. Requests come from `DataInitializer` seeds (one per rule outcome) or the
+`NewScreening` page. bankEx's own loan flows still use their own rules.
+
+⚠️ **No auth.** The reviewer ID is free text kept in the `reviewerStore` (Zustand, persisted).
+
+Frontend: 3 pages — `ScreeningQueue` (status tabs, defaults to 수동심사 대기), `ScreeningDetail`
+(approve with optional reduced amount / reject), `NewScreening`.
+
+Tests: 17 (engine rules and boundaries 8, service flow 8, context load 1).
 
 ---
 
@@ -300,11 +310,11 @@ Paths in the Status column are packages inside `Mobile/bankEx`'s backend unless 
 | `전세.md` | 304 | ✅ implemented (`bankEx/loan/jeonse`) |
 | `대환.md` | 1405 | ✅ implemented (`Core/refinancing/`, see `Etc/report/20260812.md`) |
 | `기타구현해야하는.md` | 579 | 🟡 partial (loan interest/repayment schedule done) |
-| `기타구현해야하는_2.md` | 857 | 🟡 partial (§3 대출이자, §4 정기예금 done; §5 카드 / §6 외환 / §7 알림 / §8 OTP / §9 Screening 정리 not started) |
+| `기타구현해야하는_2.md` | 857 | 🟡 partial (§3 대출이자, §4 정기예금 done; §5 카드 / §6 외환 / §7 알림 / §8 OTP not started; §9 Screening 정리 done as option B — `Core/Screening`, see `Etc/report/20261011.md`) |
 | `주담대.md` | 447 | ❌ **not started** — no mortgage/collateral code exists anywhere |
 | `상환.md` | 712 | ✅ implemented (`Core/repayment/`, see `Etc/report/20261004.md`) |
 
-`Etc/report/` holds dated implementation reports (`20260602` → `20260927`). Each documents
+`Etc/report/` holds dated implementation reports (`20260602` → `20261011`). Each documents
 what was built, decisions taken, and scope deliberately cut. Write one after completing
 a spec.
 

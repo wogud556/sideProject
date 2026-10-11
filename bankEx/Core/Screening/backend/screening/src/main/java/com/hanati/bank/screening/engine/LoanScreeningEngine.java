@@ -1,79 +1,54 @@
 package com.hanati.bank.screening.engine;
 
-import com.hanati.bank.screening.entity.CustomerCreditInfo;
-import com.hanati.bank.screening.entity.LoanApplication;
+import com.hanati.bank.screening.dto.ScreeningRequest;
+import com.hanati.bank.screening.enums.ScreeningReasonCode;
+import com.hanati.bank.screening.enums.ScreeningStatus;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
+/**
+ * 명세 §9.4 초기 심사 규칙. 실제 신용평가·DSR이 아닌 테스트용 내부 기준이다.
+ * 거절 규칙을 수동심사 규칙보다 먼저 평가한다.
+ */
 @Component
 public class LoanScreeningEngine {
 
-    public ScreeningResult screen(CustomerCreditInfo customer, LoanApplication application) {
-        int cssScore = 0;
+    static final int REJECT_CREDIT_SCORE = 600;
+    static final int MANUAL_REVIEW_CREDIT_SCORE = 700;
+    static final long TOTAL_DEBT_INCOME_MULTIPLE = 10;
+    static final long REQUEST_INCOME_MULTIPLE = 5;
 
-        // 1. 신용점수 평가
-        int creditScore = customer.getCreditScore();
-        if (creditScore >= 900) {
-            cssScore += 40;
-        } else if (creditScore >= 800) {
-            cssScore += 30;
-        } else if (creditScore >= 700) {
-            cssScore += 20;
+    public ScreeningResult screen(ScreeningRequest req) {
+        int creditScore = req.getCreditScore();
+        long income = req.getAnnualIncome();
+        long requested = req.getRequestedAmount();
+
+        if (creditScore < REJECT_CREDIT_SCORE) {
+            return decided(ScreeningStatus.REJECTED, ScreeningReasonCode.LOW_CREDIT_SCORE);
         }
-
-        // 2. 연소득 평가
-        long income = customer.getAnnualIncome();
-        if (income >= 60_000_000L) {
-            cssScore += 25;
-        } else if (income >= 40_000_000L) {
-            cssScore += 20;
-        } else if (income >= 30_000_000L) {
-            cssScore += 10;
+        if (req.getExistingLoanAmount() + requested > income * TOTAL_DEBT_INCOME_MULTIPLE) {
+            return decided(ScreeningStatus.REJECTED, ScreeningReasonCode.DEBT_LIMIT_EXCEEDED);
         }
-
-        // 3. 재직기간 평가
-        int months = customer.getEmploymentMonths() != null ? customer.getEmploymentMonths() : 0;
-        if (months >= 36) {
-            cssScore += 20;
-        } else if (months >= 12) {
-            cssScore += 10;
+        if (requested > income * REQUEST_INCOME_MULTIPLE) {
+            return decided(ScreeningStatus.MANUAL_REVIEW, ScreeningReasonCode.INCOME_MULTIPLE_EXCEEDED);
         }
-
-        // 4. DSR 계산 (신규 대출 5년 균등 상환 가정)
-        double newAnnualRepayment = application.getRequestAmount() / 5.0;
-        double totalAnnualRepayment = customer.getAnnualRepayment() + newAnnualRepayment;
-        double dsrRate = totalAnnualRepayment / income * 100;
-
-        // 5. DSR 점수
-        if (dsrRate <= 40) {
-            cssScore += 15;
-        } else if (dsrRate <= 50) {
-            cssScore += 5;
+        if (creditScore < MANUAL_REVIEW_CREDIT_SCORE) {
+            return decided(ScreeningStatus.MANUAL_REVIEW, ScreeningReasonCode.BORDERLINE_CREDIT_SCORE);
         }
+        return new ScreeningResult(ScreeningStatus.APPROVED, requested, interestRateFor(creditScore),
+                ScreeningReasonCode.BASIC_CRITERIA_MET);
+    }
 
-        // 6. 결과 판단
-        String resultStatus;
-        String rejectReason = null;
-        long approvedAmount = application.getRequestAmount();
+    /** 신용점수 구간별 금리. 심사역 승인 시에도 같은 기준을 쓴다 */
+    public BigDecimal interestRateFor(int creditScore) {
+        if (creditScore >= 900) return new BigDecimal("3.50");
+        if (creditScore >= 800) return new BigDecimal("4.20");
+        if (creditScore >= 700) return new BigDecimal("5.50");
+        return new BigDecimal("7.00");
+    }
 
-        if (creditScore < 700) {
-            resultStatus = "REJECTED";
-            rejectReason = "신용점수 기준 미달";
-            approvedAmount = 0;
-        } else if (dsrRate > 50) {
-            resultStatus = "REJECTED";
-            rejectReason = "DSR 기준 초과";
-            approvedAmount = 0;
-        } else if (cssScore >= 80 && dsrRate <= 40) {
-            resultStatus = "APPROVED";
-        } else if (cssScore >= 60 && dsrRate <= 50) {
-            resultStatus = "CONDITIONAL";
-            approvedAmount = application.getRequestAmount() * 70 / 100;
-        } else {
-            resultStatus = "REJECTED";
-            rejectReason = "CSS 점수 기준 미달";
-            approvedAmount = 0;
-        }
-
-        return new ScreeningResult(cssScore, dsrRate, approvedAmount, resultStatus, rejectReason);
+    private ScreeningResult decided(ScreeningStatus status, ScreeningReasonCode reasonCode) {
+        return new ScreeningResult(status, null, null, reasonCode);
     }
 }
