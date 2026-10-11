@@ -2,20 +2,41 @@
 
 ### 개발한것
 1. 업무(bankEx하위)
-   1. bankEx
-      1. 수신
-      2. 여신
-         1. 일반대출
-         2. 전세자금대출
-         3. 
-   2. bankExNative
-      1. 안드로이드 기반 웹뷰 연동(실패)
-   3. Screening
-      1. 간단한 심사 업무
-   4. SystemInspectorEx
-      1. SM 자동화 테스트
+   1. Mobile
+      1. bankEx (메인 뱅킹 앱, Spring Boot + React)
+         1. 로그인 / 회원가입 / 프로필
+         2. 수신
+            1. 입출금 계좌 개설·해지, 입금·출금, 거래내역
+            2. 적금 (자동이체, 만기 처리)
+            3. 정기예금 (가입, 만기 미리보기, 중도해지)
+            4. 이체 (예금주 조회, 이체 실행)
+         3. 여신
+            1. 일반대출 (상품 조회, 신청, 승인, 실행, 이자·상환 스케줄, 상환)
+            2. 전세자금대출 (신청, 심사, 실행)
+      2. bankExNative
+         1. 안드로이드 기반 웹뷰 연동(실패)
+   2. Core
+      1. Screening
+         1. 간단한 심사 업무
+      2. refinancing
+         1. 대환대출 (자격 확인, 상환 조회, 신청·심사·승인·실행, 실패 재시도, 이력, 대시보드)
+      3. repayment
+         1. 대출 상환 코어 (상환 견적, 부분·전액 상환, 상환 취소, 과오납 환불) - 백엔드만
+   3. Etc
+      1. SystemInspectorEx
+         1. SM 자동화 테스트
+      2. 명세 / report
+         1. 개발 명세서와 날짜별 구현 리포트
 2. 비업무(etc 하위)
    1. domain-gesture-ar
       1. 노트북 웹캠으로 제스처 인식 테스트
-   2. resume_ingelligence
+   2. resume_intelligence
       1. pdf ocr 기능으로 이력서 스캔하여 매칭되는 기업정보 가져오기(dart api)
+   3. passage_quiz_mcp
+      1. 지문을 넣으면 객관식 문제를 만들어 주는 MCP 서버
+   4. claude_Edu
+      1. 개인 프로필 웹페이지
+
+### 개발 예정
+1. 주택담보대출 (`bankEx/Etc/명세/주담대.md`)
+2. 카드 / 외환 / 알림 / OTP (`bankEx/Etc/명세/기타구현해야하는_2.md`)
