@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: mortgage
+  profiles:
+    active: local
+mortgage:
+  gateway:
+    mode: mock
+  bankex:
+    base-url: http://localhost:8080
+    internal-token: test-token

@@ -9,3 +9,10 @@ mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
+
+# 주택담보대출은 Core/mortgage(8084)가 원장이다. bankEx는 고객 채널과 수신계좌 입출금만 맡는다
+mortgage:
+  core:
+    base-url: http://localhost:8084/api/v1/mortgages
+  # Core가 실행금 입금 내부 API를 호출할 때 보내는 공유 토큰. Core의 mortgage.bankex.internal-token과 같아야 한다
+  internal-token: local-mortgage-core-token

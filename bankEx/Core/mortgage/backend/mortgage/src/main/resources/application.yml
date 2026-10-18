@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: mortgage
+  profiles:
+    active: local
+server:
+  port: 8084
+
+mortgage:
+  # 대출 실행금을 입금할 bankEx 수신계좌 시스템. mock이면 bankEx 없이 항상 성공한다
+  gateway:
+    mode: bankex
+  bankex:
+    base-url: http://localhost:8080
+    # bankEx 내부 API 호출용 공유 토큰. bankEx의 mortgage.internal-token과 같아야 한다
+    internal-token: local-mortgage-core-token

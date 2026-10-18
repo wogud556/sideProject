@@ -53,7 +53,11 @@ public enum ErrorCode {
     DAILY_TRANSFER_LIMIT_EXCEEDED("1일 이체한도를 초과했습니다."),
     DUPLICATE_TRANSFER_REQUEST("이미 처리 중이거나 완료된 이체 요청입니다."),
     TRANSFER_NOT_FOUND("이체 내역을 찾을 수 없습니다."),
-    TRANSFER_PROCESSING_FAILED("이체 처리 중 오류가 발생했습니다.");
+    TRANSFER_PROCESSING_FAILED("이체 처리 중 오류가 발생했습니다."),
+    MORTGAGE_CORE_UNAVAILABLE("주택담보대출 시스템에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요."),
+    MORTGAGE_NOT_OWNED("본인의 주택담보대출 정보가 아닙니다."),
+    MORTGAGE_FULLY_REPAID("상환이 모두 끝난 대출입니다."),
+    INVALID_INTERNAL_TOKEN("허용되지 않은 내부 시스템 호출입니다.");
 
     private final String message;
 }

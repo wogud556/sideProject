@@ -7,6 +7,9 @@ import Loan from '../pages/loan/general/loan'
 import JeonseLoan from '../pages/loan/jeonse/JeonseLoan'
 import MyLoans from '../pages/loan/general/MyLoans'
 import AccountDetail from '../pages/deposit/general/AccountDetail'
+import MortgageApply from '../pages/loan/mortgage/MortgageApply'
+import MortgageApplications from '../pages/loan/mortgage/MortgageApplications'
+import MortgageAccount from '../pages/loan/mortgage/MortgageAccount'
 import { path } from './path'
 
 export default function AppRouter() {
@@ -21,6 +24,9 @@ export default function AppRouter() {
         <Route path={path.jeonseLoan} element={<JeonseLoan />} />
         <Route path={path.myLoans} element={<MyLoans />} />
         <Route path={path.accountDetail} element={<AccountDetail />} />
+        <Route path={path.mortgage} element={<MortgageApply />} />
+        <Route path={path.mortgageApplications} element={<MortgageApplications />} />
+        <Route path={path.mortgageAccount} element={<MortgageAccount />} />
       </Routes>
     </BrowserRouter>
   )

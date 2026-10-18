@@ -16,7 +16,8 @@ bankEx/                          ← effective root (you are here)
 ├─ Core/                         back-office business services (no mobile client)
 │   ├─ Screening/                3. Loan screening for underwriters (Spring Boot :8081 + React :5174)
 │   ├─ refinancing/              4. Loan refinancing      (Spring Boot :8082 + React :5175)
-│   └─ repayment/                5. Loan repayment core   (Spring Boot :8083, no frontend)
+│   ├─ repayment/                5. Loan repayment core   (Spring Boot :8083, no frontend)
+│   └─ mortgage/                 7. Mortgage loan core    (Spring Boot :8084 + React :5176)
 └─ Etc/                          everything that is not a banking service
     ├─ 명세/                      Development specs (source of truth for new work)
     ├─ report/                   Dated implementation reports
@@ -24,11 +25,14 @@ bankEx/                          ← effective root (you are here)
 ```
 
 The `Mobile` / `Core` / `Etc` grouping is organisational only — it introduces no shared
-build, no parent Gradle project, and no cross-directory imports. Each of the five
-projects still builds and runs entirely on its own.
+build, no parent Gradle project, and no cross-directory imports. Each project still builds
+and runs entirely on its own.
 
-Projects 1, 3, 4 and 5 are **independent Spring Boot applications** with separate ports and
-separate in-memory databases. They do not call each other. Shared conventions were
+Projects 1, 3, 4, 5 and 7 are **independent Spring Boot applications** with separate ports and
+separate in-memory databases. They do not call each other — **except `Mobile/bankEx` ↔
+`Core/mortgage`**, the first (and only) runtime dependency between projects: bankEx's customer
+mortgage API calls Core over REST, and Core calls bankEx back to pay out loan proceeds (see
+Project 7). Both still start without the other; the calls just fail until both are up. Shared conventions were
 copied, not extracted into a library — `Mobile/bankEx` is the original, `Core/Screening`
 and `Core/refinancing` followed its patterns.
 
@@ -57,6 +61,7 @@ Each backend and frontend is its own build. `cd` into the directory first.
 | Screening | `Core/Screening/backend/screening/` | 8081 |
 | refinancing | `Core/refinancing/backend/refinance/` | 8082 |
 | repayment | `Core/repayment/backend/repayment/` | 8083 |
+| mortgage | `Core/mortgage/backend/mortgage/` | 8084 |
 
 ```bash
 ./gradlew bootRun         # start server
@@ -72,6 +77,7 @@ Each backend and frontend is its own build. `cd` into the directory first.
 | bankEx | `Mobile/bankEx/front/bankEx_Front/` | 5173 (Vite default, `host: true`) |
 | Screening | `Core/Screening/front/screening_front/` | 5174 |
 | refinancing | `Core/refinancing/front/refinance_front/` | 5175 |
+| mortgage | `Core/mortgage/front/mortgage_front/` | 5176 |
 
 ```bash
 npm run dev      # dev server
@@ -127,6 +133,8 @@ Base path `/api/bank/user`. Package root `com.hanati.bank.bankEx`.
 | Loans (여신 일반) | `loan/general/` | `/loan/products`, `/loan/products/{id}`, `/loan/apply`, `/loan/applications`, `/loan/validate-customer-account`, `/loan/applications/{id}/approve`, `/loan/disbursement`, `/loan/repayment` |
 | Loan repayment | `loan/general/` | `/loans/{id}/repay`, `/loans/{id}/repayment-preview`, `/loans/{id}/repayment-history` |
 | Jeonse loans (전세대출) | `loan/jeonse/` | `/loan/jeonse/products`, `/loan/jeonse/applications`, `/loan/jeonse/applications/{id}/review`, `/loan/jeonse/applications/{id}/execute` |
+| Mortgage (주담대, customer channel) | `loan/mortgage/` | `/loan/mortgage/products`, `/applications` (+`/{id}`, `/{id}/agreement`, `/{id}/withdraw`), `/accounts` (+`/{id}`, `/{id}/schedule`, `/{id}/repayments`) — all forwarded to Core/mortgage |
+| Internal (Core → bankEx) | `loan/mortgage/` | `POST /api/internal/mortgage/disbursements` — **outside** `/api/bank/user`, requires `X-Internal-Token` |
 
 Each domain package is flat: `controller/ service/ dto/ (entity|domain)/ (repository|mapper)/ enums/`.
 
@@ -143,11 +151,14 @@ Frontend (`Mobile/bankEx/front/bankEx_Front/src/`):
 - `router/path.ts` (constants) + `router/index_router.tsx` (BrowserRouter)
 - `pages/` is nested by domain: `common/`, `login/`, `deposit/general/`,
   `loan/general/`, `loan/jeonse/`
-- 8 routes: Login, Signup, Home, MyPage, Loan, JeonseLoan, MyLoans, AccountDetail
+- 11 routes: Login, Signup, Home, MyPage, Loan, JeonseLoan, MyLoans, AccountDetail,
+  MortgageApply, MortgageApplications, MortgageAccount (`pages/loan/mortgage/`, API in `api/mortgage_api.ts`)
 
-Tests: 16 files under `src/test/`, mixing flow/integration tests
+Tests: 17 files under `src/test/`, mixing flow/integration tests
 (`TransferFlowTests`, `SavingsFlowTests`, `AccountCloseFlowTests`, `JeonseLoanFlowTests`,
-`TransferConcurrencyTests`) with unit tests on calculators and services.
+`TransferConcurrencyTests`, `MortgageChannelTests`) with unit tests on calculators and services.
+`MortgageChannelTests` mocks `MortgageCoreClient` and is deliberately not `@Transactional`
+(it checks that a repayment debit rolls back when Core rejects).
 
 ---
 
@@ -283,6 +294,43 @@ concurrency test deliberately omits `@Transactional` so the pessimistic lock act
 
 ---
 
+## Project 7: `Core/mortgage/` — Mortgage loan core (주택담보대출)
+
+Base path `/api/v1/mortgages`. Package root `com.hanati.bank.mortgage`. Spec `Etc/명세/주담대.md`,
+build log `Etc/report/20261017.md`. JPA only. The **system of record** for mortgages — bankEx keeps
+no mortgage tables; it only relays customer requests and owns the deposit accounts.
+
+Modules (each with `entity/ repository/ service/ controller/ dto/`): `application/` (원장 + 주택·소득·부채,
+status machine), `collateral/` (평가 이력, 권리관계), `policy/`, `limit/`, `screening/`, `approval/`
+(승인·약정·실행 선행조건), `execution/` (실행 이력, 대출 계좌), `repayment/`, `gateway/`, `operator/`, `product/`.
+
+| Concern | Where |
+|---|---|
+| Status rules | `application/enums/ApplicationStatusTransition` — change transitions there, not in services |
+| Limit engine | `limit/engine/MortgageLimitEngine` — min(담보가용액, DTI, 스트레스 DSR, 상품, 규제); principal back-solved via `AnnualDebtService` |
+| Regulation values | `MORTGAGE_POLICY` rows resolved by `policy/service/PolicyResolver` (effective date, specificity product 4 > borrower 2 > region 1, then version). Never hard-code LTV/DSR in code |
+| Reproducibility | `MortgageLimitResult` stores inputs, outputs and the 5 policy IDs used |
+| Screening | `screening/engine/MortgageScreeningEngine` — separate from the limit engine by design |
+| Execution | `execution/service/MortgageExecutionService` — row lock + `Idempotency-Key`; bankEx payout key fixed per application (`MGD-{applicationNo}`) so retries never pay twice |
+| Payout | `gateway/BankExDisbursementGateway` (default) or `MockDisbursementGateway` (`mortgage.gateway.mode=mock`, used by tests) |
+| Schedules | `repayment/calculator/` — 원리금균등·원금균등·만기일시 |
+
+⚠️ **Auth is not real.** Operator endpoints take `X-Operator-Id`; `OperatorGuard` checks one role per
+operator (OPERATIONS `OPS01`, UNDERWRITER `UW01`, APPROVER `AP01`), which also enforces 심사자 ≠ 승인자.
+Customer endpoints take `customerId` in the body and are meant to be called only by bankEx.
+
+⚠️ **Shared secret.** `mortgage.bankex.internal-token` (Core) must equal `mortgage.internal-token` (bankEx).
+
+⚠️ **Out of scope**: 연체, 중도상환/수수료, 금리 변경, 부분상환, 휴일 조정. Repayment pays exactly the next
+installment. Seeded policy values are illustrative, not real regulation.
+
+Frontend: `ApplicationQueue` (stage tabs) → `ApplicationDetail` (one panel per stage, form only on the
+current stage) plus `PolicyList`, `LoanAccountDetail`. Zustand `operatorStore`; Axios injects the header.
+
+Tests: 42 (limit engine 9, repayment calculators 6, screening engine 7, policy 5, flow 15).
+
+---
+
 ## Project 6: `Etc/SystemInspectorEx/` — Code-inspector MCP server
 
 TypeScript MCP server (`project-code-inspector-mcp/`) that indexes and patches a
@@ -311,10 +359,10 @@ Paths in the Status column are packages inside `Mobile/bankEx`'s backend unless 
 | `대환.md` | 1405 | ✅ implemented (`Core/refinancing/`, see `Etc/report/20260812.md`) |
 | `기타구현해야하는.md` | 579 | 🟡 partial (loan interest/repayment schedule done) |
 | `기타구현해야하는_2.md` | 857 | 🟡 partial (§3 대출이자, §4 정기예금 done; §5 카드 / §6 외환 / §7 알림 / §8 OTP not started; §9 Screening 정리 done as option B — `Core/Screening`, see `Etc/report/20261011.md`) |
-| `주담대.md` | 447 | ❌ **not started** — no mortgage/collateral code exists anywhere |
+| `주담대.md` | 447 | ✅ implemented (`Core/mortgage/` + `bankEx/loan/mortgage`, see `Etc/report/20261017.md`; 9단계 사후관리 excluded) |
 | `상환.md` | 712 | ✅ implemented (`Core/repayment/`, see `Etc/report/20261004.md`) |
 
-`Etc/report/` holds dated implementation reports (`20260602` → `20261011`). Each documents
+`Etc/report/` holds dated implementation reports (`20260602` → `20261017`). Each documents
 what was built, decisions taken, and scope deliberately cut. Write one after completing
 a spec.
 

@@ -7,4 +7,7 @@ export const path = {
     jeonseLoan: '/loan/jeonse',
     myLoans: '/my-loans',
     accountDetail: '/account/:accountNumber',
+    mortgage: '/loan/mortgage',
+    mortgageApplications: '/loan/mortgage/applications',
+    mortgageAccount: '/loan/mortgage/accounts/:loanAccountId',
 } as const
